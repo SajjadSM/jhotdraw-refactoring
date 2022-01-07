@@ -43,9 +43,8 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
 
     @Override
     protected void buildChooser() {
-        labels = PaletteLookAndFeel.getInstance();
-        initComponents();
-        PaletteLookAndFeel plaf = PaletteLookAndFeel.getInstance();
+        labels2();
+		PaletteLookAndFeel plaf = PaletteLookAndFeel.getInstance();
 
         setUI(PalettePanelUI.createUI(this));
         redLabel.setUI((LabelUI) PaletteLabelUI.createUI(redLabel));
@@ -99,21 +98,6 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
         new ColorSliderTextFieldHandler(greenField, ccModel, 1);
         new ColorSliderTextFieldHandler(blueField, ccModel, 2);
 
-        ccModel.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent evt) {
-                if (updateRecursion++ == 0) {
-                    //setColorToModel(ccModel.getColor());
-                    setColorToModel(new Color(
-                            ccModel.getBoundedRangeModel(0).getValue(),
-                            ccModel.getBoundedRangeModel(1).getValue(),
-                            ccModel.getBoundedRangeModel(2).getValue()
-                            ));
-                }
-                updateRecursion--;
-            }
-        });
         redField.setMinimumSize(redField.getPreferredSize());
         greenField.setMinimumSize(greenField.getPreferredSize());
         blueField.setMinimumSize(blueField.getPreferredSize());
@@ -122,6 +106,21 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
         greenLabel.setBorder(bm);
         blueLabel.setBorder(bm);
     }
+
+	private void labels2() {
+		labels = PaletteLookAndFeel.getInstance();
+		initComponents();
+		ccModel.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				if (updateRecursion++ == 0) {
+					setColorToModel(new Color(ccModel.getBoundedRangeModel(0).getValue(),
+							ccModel.getBoundedRangeModel(1).getValue(), ccModel.getBoundedRangeModel(2).getValue()));
+				}
+				updateRecursion--;
+			}
+		});
+	}
 
     @Override
     public String getDisplayName() {
@@ -158,20 +157,17 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        redLabel = new javax.swing.JLabel();
-        redSlider = new javax.swing.JSlider();
+        labels3();
+		redSlider = new javax.swing.JSlider();
         redField = new javax.swing.JTextField();
-        greenLabel = new javax.swing.JLabel();
         greenSlider = new javax.swing.JSlider();
         greenField = new javax.swing.JTextField();
-        blueLabel = new javax.swing.JLabel();
         blueSlider = new javax.swing.JSlider();
         blueField = new javax.swing.JTextField();
         springPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        redLabel.setText(labels.getString("ColorChooser.rgbRedText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
@@ -206,7 +202,6 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
         add(redField, gridBagConstraints);
 
-        greenLabel.setText(labels.getString("ColorChooser.rgbGreenText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
@@ -241,7 +236,6 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
         add(greenField, gridBagConstraints);
 
-        blueLabel.setText(labels.getString("ColorChooser.rgbBlueText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
@@ -283,6 +277,15 @@ public class PaletteRGBChooser extends AbstractColorChooserPanel implements UIRe
         gridBagConstraints.weighty = 1.0;
         add(springPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+	private void labels3() {
+		redLabel = new javax.swing.JLabel();
+		greenLabel = new javax.swing.JLabel();
+		blueLabel = new javax.swing.JLabel();
+		redLabel.setText(labels.getString("ColorChooser.rgbRedText"));
+		greenLabel.setText(labels.getString("ColorChooser.rgbGreenText"));
+		blueLabel.setText(labels.getString("ColorChooser.rgbBlueText"));
+	}
 
     private void fieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldFocusGained
         ((JTextField) evt.getSource()).selectAll();

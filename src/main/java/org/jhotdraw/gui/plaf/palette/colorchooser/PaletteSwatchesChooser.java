@@ -198,16 +198,8 @@ public class PaletteSwatchesChooser extends AbstractColorChooserPanel {
         initComponents();
         setUI(PalettePanelUI.createUI(this));
         jList.setUI((ListUI) PaletteListUI.createUI(jList));
-        Object[] byRows=HSB_COLORS_AS_RGB.toArray();
-        Object[] byColumns=new Object[byRows.length];
-        for (int y=0,my=byRows.length/HSB_COLORS_AS_RGB_COLUMN_COUNT;y<my;y++) {
-        for (int x=0;x< HSB_COLORS_AS_RGB_COLUMN_COUNT;x++) {
-            if (x*my+y<byColumns.length)
-                byColumns[x*my+y]=byRows[y*HSB_COLORS_AS_RGB_COLUMN_COUNT+x];
-        }
-        }
-        byColumns[byColumns.length-1]=byRows[byRows.length-1];
-        jList.setListData(byColumns);
+        Object[] byColumns = byColumns2();
+		jList.setListData(byColumns);
         jList.setVisibleRowCount(HSB_COLORS_AS_RGB.size() / HSB_COLORS_AS_RGB_COLUMN_COUNT);
         jList.addListSelectionListener(new ListSelectionListener() {
 
@@ -221,6 +213,19 @@ public class PaletteSwatchesChooser extends AbstractColorChooserPanel {
             }
         });
     }
+
+	private Object[] byColumns2() {
+		Object[] byRows = HSB_COLORS_AS_RGB.toArray();
+		Object[] byColumns = new Object[byRows.length];
+		for (int y = 0, my = byRows.length / HSB_COLORS_AS_RGB_COLUMN_COUNT; y < my; y++) {
+			for (int x = 0; x < HSB_COLORS_AS_RGB_COLUMN_COUNT; x++) {
+				if (x * my + y < byColumns.length)
+					byColumns[x * my + y] = byRows[y * HSB_COLORS_AS_RGB_COLUMN_COUNT + x];
+			}
+		}
+		byColumns[byColumns.length - 1] = byRows[byRows.length - 1];
+		return byColumns;
+	}
 
     public void setColorToModel(@Nullable Color color) {
         getColorSelectionModel().setSelectedColor(color);
