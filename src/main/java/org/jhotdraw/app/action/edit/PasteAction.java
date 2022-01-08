@@ -57,13 +57,8 @@ public class PasteAction extends AbstractSelectionAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        JComponent c = target;
-        if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner() instanceof JComponent)) {
-            c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                    getPermanentFocusOwner();
-        }
-        if (c != null && c.isEnabled()) {
+        JComponent c = c();
+		if (c != null && c.isEnabled()) {
             Transferable t = ClipboardUtil.getClipboard().getContents(c);
             if (t != null && c.getTransferHandler() != null) {
                 c.getTransferHandler().importData(
@@ -72,6 +67,15 @@ public class PasteAction extends AbstractSelectionAction {
             }
         }
     }
+
+	private JComponent c() {
+		JComponent c = target;
+		if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.getPermanentFocusOwner() instanceof JComponent)) {
+			c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+		}
+		return c;
+	}
     @Override
     protected void updateEnabled() {
         if (target != null) {

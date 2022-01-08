@@ -60,13 +60,18 @@ public class RedoAction extends AbstractViewAction {
     }
 
     protected void updateEnabledState() {
-        boolean isEnabled = false;
-        Action realRedoAction = getRealRedoAction();
-        if (realRedoAction != null && realRedoAction!=this) {
-            isEnabled = realRedoAction.isEnabled();
-        }
-        setEnabled(isEnabled);
+        boolean isEnabled = isEnabld();
+		setEnabled(isEnabled);
     }
+
+	private boolean isEnabld() {
+		boolean isEnabled = false;
+		Action realRedoAction = getRealRedoAction();
+		if (realRedoAction != null && realRedoAction != this) {
+			isEnabled = realRedoAction.isEnabled();
+		}
+		return isEnabled;
+	}
 
     @Override
     protected void updateView(@Nullable View oldValue, @Nullable View newValue) {
