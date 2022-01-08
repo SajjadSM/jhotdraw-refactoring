@@ -38,23 +38,11 @@ public class ChopRoundRectangleConnector extends ChopRectangleConnector {
        
     @Override
     protected Point2D.Double chop(Figure target, Point2D.Double from) {
-        target =  getConnectorTarget(target);
+        double grow = grow(target);
+		target =  getConnectorTarget(target);
         RoundRectangleFigure rrf = (RoundRectangleFigure) target;
         Rectangle2D.Double outer = rrf.getBounds();
 
-        double grow;
-        switch (target.get(STROKE_PLACEMENT)) {
-            case CENTER :
-            default :
-                grow = AttributeKeys.getStrokeTotalWidth(target) / 2d;
-                break;
-            case OUTSIDE :
-                grow = AttributeKeys.getStrokeTotalWidth(target);
-                break;
-            case INSIDE :
-                grow = 0;
-                break;
-        }
         Geom.grow(outer, grow, grow);
         
         
@@ -77,4 +65,22 @@ public class ChopRoundRectangleConnector extends ChopRectangleConnector {
         }
         return p;
     }
+
+	private double grow(Figure target) {
+		target = getConnectorTarget(target);
+		double grow;
+		switch (target.get(STROKE_PLACEMENT)) {
+		case CENTER:
+		default:
+			grow = AttributeKeys.getStrokeTotalWidth(target) / 2d;
+			break;
+		case OUTSIDE:
+			grow = AttributeKeys.getStrokeTotalWidth(target);
+			break;
+		case INSIDE:
+			grow = 0;
+			break;
+		}
+		return grow;
+	}
 }

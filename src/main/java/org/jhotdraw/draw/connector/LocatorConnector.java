@@ -80,15 +80,23 @@ public class LocatorConnector extends AbstractConnector {
     
     @Override public void read(DOMInput in) throws IOException {
         super.read(in);
-        in.openElement("locator");
-        this.locator = (Locator) in.readObject(0);
-        in.closeElement();
+        in(in);
     }
+
+	private void in(DOMInput in) throws java.io.IOException {
+		in.openElement("locator");
+		this.locator = (Locator) in.readObject(0);
+		in.closeElement();
+	}
     
    @Override public void write(DOMOutput out) throws IOException {
         super.write(out);
-        out.openElement("locator");
-        out.writeObject(locator);
-        out.closeElement();
+        out(out);
     }
+
+private void out(DOMOutput out) throws java.io.IOException {
+	out.openElement("locator");
+	out.writeObject(locator);
+	out.closeElement();
+}
 }
