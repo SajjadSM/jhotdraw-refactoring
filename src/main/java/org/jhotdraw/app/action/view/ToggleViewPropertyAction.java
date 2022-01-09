@@ -14,6 +14,8 @@ package org.jhotdraw.app.action.view;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.event.*;
 import java.beans.*;
+import java.lang.reflect.InvocationTargetException;
+
 import org.jhotdraw.app.Application;
 import org.jhotdraw.app.View;
 import org.jhotdraw.app.action.AbstractViewAction;
@@ -119,20 +121,46 @@ public class ToggleViewPropertyAction extends AbstractViewAction {
             // has been completed.
             return;
         }
-        boolean isSelected = false;
-        View p = getActiveView();
-        if (p != null) {
-            try {
-                Object value = p.getClass().getMethod(getterName, (Class[]) null).invoke(p);
-                isSelected = value == selectedPropertyValue ||
-                        value != null && selectedPropertyValue != null &&
-                        value.equals(selectedPropertyValue);
-            } catch (Throwable e) {
-                InternalError error = new InternalError("No "+getterName+" method on "+p+" for property "+propertyName);
-                error.initCause(e);
-                throw error;
-            }
-        }
-        putValue(ActionUtil.SELECTED_KEY, isSelected);
+        boolean isSelected;
+		try {
+			isSelected = isSelected();
+
+		putValue(ActionUtil.SELECTED_KEY, isSelected);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
+	private boolean isSelected() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		boolean isSelected = false;
+		View p = getActiveView();
+		if (p != null) {
+			Object value = p.getClass().getMethod(getterName, (Class[]) null).invoke(p);
+			isSelected = value == selectedPropertyValue
+					|| value != null && selectedPropertyValue != null && value.equals(selectedPropertyValue);
+			try {
+				 value = p.getClass().getMethod(getterName, (Class[]) null).invoke(p);
+				isSelected = value == selectedPropertyValue
+						|| value != null && selectedPropertyValue != null && value.equals(selectedPropertyValue);
+			} catch (Throwable e) {
+				InternalError error = new InternalError(
+						"No " + getterName + " method on " + p + " for property " + propertyName);
+				error.initCause(e);
+				throw error;
+			}
+		}
+		return isSelected;
+	}
 }

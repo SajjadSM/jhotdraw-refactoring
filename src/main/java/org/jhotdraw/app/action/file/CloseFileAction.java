@@ -51,8 +51,12 @@ public class CloseFileAction extends AbstractSaveUnsavedChangesAction {
     @Override
     protected void doIt(View view) {
         if (view != null && view.getApplication() != null) {
-            Application app = view.getApplication();
-            app.dispose(view);
+            view(view);
         }
     }
+
+	private void view(View view) {
+		Application app = view.getApplication();
+		app.dispose(view);
+	}
 }
