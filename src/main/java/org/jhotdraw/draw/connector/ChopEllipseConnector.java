@@ -48,22 +48,27 @@ public class ChopEllipseConnector extends ChopRectangleConnector {
         target =  getConnectorTarget(target);
         Rectangle2D.Double r = target.getBounds();
         if (getStrokeColor(target) != null) {
-            double grow;
-            switch (target.get(STROKE_PLACEMENT)) {
-                case CENTER:
-                 default :
-                    grow = getStrokeTotalWidth(target) / 2d;
-                    break;
-                case OUTSIDE :
-                    grow = getStrokeTotalWidth(target);
-                    break;
-                case INSIDE :
-                    grow = 0f;
-                    break;
-            }
-            Geom.grow(r, grow, grow);
+            double grow = grow(target);
+			Geom.grow(r, grow, grow);
         }
         double angle = Geom.pointToAngle(r, from);
         return Geom.ovalAngleToPoint(r, angle);
     }
+
+	private double grow(Figure target) {
+		double grow;
+		switch (target.get(STROKE_PLACEMENT)) {
+		case CENTER:
+		default:
+			grow = getStrokeTotalWidth(target) / 2d;
+			break;
+		case OUTSIDE:
+			grow = getStrokeTotalWidth(target);
+			break;
+		case INSIDE:
+			grow = 0f;
+			break;
+		}
+		return grow;
+	}
 }

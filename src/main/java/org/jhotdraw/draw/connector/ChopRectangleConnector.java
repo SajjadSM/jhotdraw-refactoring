@@ -81,22 +81,27 @@ public class ChopRectangleConnector extends AbstractConnector {
         target = getConnectorTarget(target);
         Rectangle2D.Double r = target.getBounds();
         if (target.get(STROKE_COLOR) != null) {
-            double grow;
-            switch (target.get(STROKE_PLACEMENT)) {
-                case CENTER:
-                default :
-                    grow = AttributeKeys.getStrokeTotalWidth(target) / 2d;
-                    break;
-                case OUTSIDE :
-                    grow = AttributeKeys.getStrokeTotalWidth(target);
-                    break;
-                case INSIDE :
-                    grow = 0d;
-                    break;
-            }
-            Geom.grow(r, grow, grow);
+            double grow = grow(target);
+			Geom.grow(r, grow, grow);
         }
         return Geom.angleToPoint(r, Geom.pointToAngle(r, from));
     }
+
+	private double grow(Figure target) {
+		double grow;
+		switch (target.get(STROKE_PLACEMENT)) {
+		case CENTER:
+		default:
+			grow = AttributeKeys.getStrokeTotalWidth(target) / 2d;
+			break;
+		case OUTSIDE:
+			grow = AttributeKeys.getStrokeTotalWidth(target);
+			break;
+		case INSIDE:
+			grow = 0d;
+			break;
+		}
+		return grow;
+	}
     
 }
