@@ -74,28 +74,29 @@ public class SelectionComponentDisplayer
     }
 
     public void updateVisibility() {
-        boolean newValue = editor != null &&
-                editor.getActiveView() != null &&
-                (isVisibleIfCreationTool && editor.getTool() != null && !(editor.getTool() instanceof SelectionTool) ||
-                editor.getActiveView().getSelectionCount() >= minSelectionCount);
-        JComponent component = weakRef.get();
-        if (component == null) {
+        JComponent component = component();
+		if (component == null) {
             dispose();
             return;
         }
-        if (newValue != component.isVisible()) {
-        component.setVisible(newValue);
-
-        // The following is needed to trick BoxLayout
-        if (newValue) {
-            component.setPreferredSize(null);
-        } else {
-            component.setPreferredSize(new Dimension(0, 0));
-        }
-
-        component.revalidate();
-        }
     }
+
+	private JComponent component() {
+		boolean newValue = editor != null && editor.getActiveView() != null
+				&& (isVisibleIfCreationTool && editor.getTool() != null && !(editor.getTool() instanceof SelectionTool)
+						|| editor.getActiveView().getSelectionCount() >= minSelectionCount);
+		JComponent component = weakRef.get();
+		if (newValue != component.isVisible()) {
+			component.setVisible(newValue);
+			if (newValue) {
+				component.setPreferredSize(null);
+			} else {
+				component.setPreferredSize(new Dimension(0, 0));
+			}
+			component.revalidate();
+		}
+		return component;
+	}
 
     @Nullable
     protected JComponent getComponent() {

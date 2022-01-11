@@ -54,10 +54,9 @@ public class SelectionComponentRepainter extends FigureAdapter
     public void propertyChange(PropertyChangeEvent evt) {
         String name = evt.getPropertyName();
         if (name == DrawingEditor.ACTIVE_VIEW_PROPERTY) {
-            DrawingView view = (DrawingView) evt.getOldValue();
-            if (view != null) {
+            DrawingView view = view(evt);
+			if (view != null) {
                 view.removePropertyChangeListener(this);
-                view.removeFigureSelectionListener(this);
                 if (view.getDrawing() != null) {
                     view.getDrawing().removeFigureListener(this);
                 }
@@ -65,26 +64,42 @@ public class SelectionComponentRepainter extends FigureAdapter
             view = (DrawingView) evt.getNewValue();
             if (view != null) {
                 view.addPropertyChangeListener(this);
-                view.addFigureSelectionListener(this);
                 if (view.getDrawing() != null) {
                     view.getDrawing().addFigureListener(this);
                 }
             }
             component.repaint();
         } else if (name == DrawingView.DRAWING_PROPERTY) {
-            Drawing drawing = (Drawing) evt.getOldValue();
-            if (drawing != null) {
-                drawing.removeFigureListener(this);
-            }
-            drawing = (Drawing) evt.getNewValue();
-            if (drawing != null) {
-                drawing.addFigureListener(this);
-            }
-            component.repaint();
+            Drawing drawing = drawing(evt);
+			component.repaint();
         } else {
             component.repaint();
         }
     }
+
+	private DrawingView view(PropertyChangeEvent evt) {
+		DrawingView view = (DrawingView) evt.getOldValue();
+		if (view != null) {
+			view.removeFigureSelectionListener(this);
+		}
+		view = (DrawingView) evt.getNewValue();
+		if (view != null) {
+			view.addFigureSelectionListener(this);
+		}
+		return view;
+	}
+
+	private Drawing drawing(PropertyChangeEvent evt) {
+		Drawing drawing = (Drawing) evt.getOldValue();
+		if (drawing != null) {
+			drawing.removeFigureListener(this);
+		}
+		drawing = (Drawing) evt.getNewValue();
+		if (drawing != null) {
+			drawing.addFigureListener(this);
+		}
+		return drawing;
+	}
 
     @Override
     public void selectionChanged(FigureSelectionEvent evt) {

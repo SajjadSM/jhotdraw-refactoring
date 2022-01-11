@@ -37,23 +37,27 @@ public class JAttributeTextArea<T> extends JLifeFormattedTextArea implements Att
     @Override
     protected void paintComponent(Graphics g) {
         if (!isFocusOwner() && isMultipleValues) {
-            ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.gui.Labels");
-            Color c = getForeground();
+            ResourceBundleUtil labels = labels(g);
+			Color c = getForeground();
             setForeground(new Color(0x0, true));
             super.paintComponent(g);
-            Insets insets = getInsets();
-            Insets margin = getMargin();
-            FontMetrics fm = g.getFontMetrics(getFont());
             g.setFont(getFont().deriveFont(Font.ITALIC));
             setForeground(c);
             g.setColor(c);
-            g.drawString(labels.getString("attribute.differentValues.text"),
-                    insets.left + margin.left,
-                    insets.top + margin.top + fm.getAscent());
         } else {
             super.paintComponent(g);
         }
     }
+
+	private ResourceBundleUtil labels(Graphics g) throws java.util.MissingResourceException {
+		ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.gui.Labels");
+		Insets insets = getInsets();
+		Insets margin = getMargin();
+		FontMetrics fm = g.getFontMetrics(getFont());
+		g.drawString(labels.getString("attribute.differentValues.text"), insets.left + margin.left,
+				insets.top + margin.top + fm.getAscent());
+		return labels;
+	}
 
     /** This method is called from within the constructor to
      * initialize the form.
