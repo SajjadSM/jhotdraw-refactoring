@@ -42,12 +42,16 @@ public class TransformHandleKit {
      */
     static public void addCornerTransformHandles(Figure f, Collection<Handle> handles) {
         if (f.isTransformable()) {
-            handles.add(southEast(f));
-            handles.add(southWest(f));
-            handles.add(northEast(f));
-            handles.add(northWest(f));
+            handles(f, handles);
         }
     }
+
+	private static void handles(Figure f, Collection<Handle> handles) {
+		handles.add(southEast(f));
+		handles.add(southWest(f));
+		handles.add(northEast(f));
+		handles.add(northWest(f));
+	}
 
     /**
      * Fills the given Vector with handles at each
@@ -55,22 +59,30 @@ public class TransformHandleKit {
      */
     static public void addEdgeTransformHandles(Figure f, Collection<Handle> handles) {
         if (f.isTransformable()) {
-            handles.add(south(f));
-            handles.add(north(f));
-            handles.add(east(f));
-            handles.add(west(f));
+            handles2(f, handles);
         }
     }
+
+	private static void handles2(Figure f, Collection<Handle> handles) {
+		handles.add(south(f));
+		handles.add(north(f));
+		handles.add(east(f));
+		handles.add(west(f));
+	}
 
     /**
      * Adds handles for scaling and moving a Figure.
      */
     static public void addScaleMoveTransformHandles(Figure f, Collection<Handle> handles) {
         if (f.isTransformable()) {
-            addCornerTransformHandles(f, handles);
-            addEdgeTransformHandles(f, handles);
+            handles3(f, handles);
         }
     }
+
+	private static void handles3(Figure f, Collection<Handle> handles) {
+		addCornerTransformHandles(f, handles);
+		addEdgeTransformHandles(f, handles);
+	}
 
     /**
      * Adds handles for scaling, moving, rotating and shearing a Figure.

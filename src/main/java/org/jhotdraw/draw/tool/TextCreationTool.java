@@ -108,19 +108,23 @@ public class TextCreationTool extends CreationTool implements ActionListener {
     }
     
     protected void beginEdit(TextHolderFigure textHolder) {
-        if (textField == null) {
-            textField = new FloatingTextField();
-            textField.addActionListener(this);
-        }
-        
-        if (textHolder != typingTarget && typingTarget != null) {
-            endEdit();
-        }
-        
-        textField.createOverlay(getView(), textHolder);
-        textField.requestFocus();
+        textField(textHolder);
+		textField.requestFocus();
         typingTarget = textHolder;
     }
+	private void textField(TextHolderFigure textHolder) {
+		if (textField == null) {
+			textField = new FloatingTextField();
+			textField.addActionListener(this);
+		}
+		typingTarget(textHolder);
+	}
+	private void typingTarget(TextHolderFigure textHolder) {
+		if (textHolder != typingTarget && typingTarget != null) {
+			endEdit();
+		}
+		textField.createOverlay(getView(), textHolder);
+	}
     
     
     @Override

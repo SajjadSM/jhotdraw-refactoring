@@ -184,15 +184,20 @@ public class DOMStorableInputOutputFormat implements OutputFormat, InputFormat {
 
     @Override
     public void read(InputStream in, Drawing drawing, boolean replace) throws IOException {
-        NanoXMLDOMInput domi = new NanoXMLDOMInput(factory, in);
-        domi.openElement(factory.getName(drawing));
-        if (replace) {
+        NanoXMLDOMInput domi = domi(in, drawing);
+		if (replace) {
             drawing.removeAllChildren();
         }
-        drawing.read(domi);
-        domi.closeElement();
-        domi.dispose();
     }
+
+	private NanoXMLDOMInput domi(InputStream in, Drawing drawing) throws java.io.IOException {
+		NanoXMLDOMInput domi = new NanoXMLDOMInput(factory, in);
+		domi.openElement(factory.getName(drawing));
+		drawing.read(domi);
+		domi.closeElement();
+		domi.dispose();
+		return domi;
+	}
 
     @Override
     public void read(Transferable t, Drawing drawing, boolean replace) throws UnsupportedFlavorException, IOException {
@@ -214,13 +219,18 @@ public class DOMStorableInputOutputFormat implements OutputFormat, InputFormat {
     @Override
     public Transferable createTransferable(Drawing drawing, List<Figure> figures, double scaleFactor) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        NanoXMLDOMOutput domo = new NanoXMLDOMOutput(factory);
-        domo.openElement("Drawing-Clip");
-        for (Figure f : figures) {
-            domo.writeObject(f);
-        }
-        domo.closeElement();
-        domo.save(buf);
+        NanoXMLDOMOutput domo = domo(figures);
+		domo.save(buf);
         return new InputStreamTransferable(new DataFlavor(mimeType, description), buf.toByteArray());
     }
+
+	private NanoXMLDOMOutput domo(List<Figure> figures) throws java.io.IOException {
+		NanoXMLDOMOutput domo = new NanoXMLDOMOutput(factory);
+		domo.openElement("Drawing-Clip");
+		for (Figure f : figures) {
+			domo.writeObject(f);
+		}
+		domo.closeElement();
+		return domo;
+	}
 }

@@ -89,20 +89,25 @@ public class TextAreaEditingTool extends AbstractTool implements ActionListener 
     }
 
     protected void beginEdit(TextHolderFigure textHolder) {
-        if (textArea == null) {
-            textArea = new FloatingTextArea();
-
-        //textArea.addActionListener(this);
-        }
-
-        if (textHolder != typingTarget && typingTarget != null) {
-            endEdit();
-        }
-        textArea.createOverlay(getView(), textHolder);
-        textArea.setBounds(getFieldBounds(textHolder), textHolder.getText());
-        textArea.requestFocus();
+        textArea(textHolder);
+		textArea.requestFocus();
         typingTarget = textHolder;
     }
+
+	private void textArea(TextHolderFigure textHolder) {
+		if (textArea == null) {
+			textArea = new FloatingTextArea();
+		}
+		typingTarget(textHolder);
+	}
+
+	private void typingTarget(TextHolderFigure textHolder) {
+		if (textHolder != typingTarget && typingTarget != null) {
+			endEdit();
+		}
+		textArea.createOverlay(getView(), textHolder);
+		textArea.setBounds(getFieldBounds(textHolder), textHolder.getText());
+	}
 
     private Rectangle2D.Double getFieldBounds(TextHolderFigure figure) {
         Rectangle2D.Double r = figure.getDrawingArea();

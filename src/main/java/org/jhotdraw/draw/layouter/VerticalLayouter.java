@@ -63,61 +63,61 @@ public class VerticalLayouter extends AbstractLayouter {
 
     @Override
     public Rectangle2D.Double layout(CompositeFigure layoutable, Point2D.Double anchor, Point2D.Double lead) {
-        Insets2D.Double layoutInsets = layoutable.get(LAYOUT_INSETS);
-        Alignment compositeAlignment = layoutable.get(COMPOSITE_ALIGNMENT);
-
-        if (layoutInsets == null) {
-            layoutInsets = new Insets2D.Double();
-        }
-        Rectangle2D.Double layoutBounds = calculateLayout(layoutable, anchor, lead);
-        double y = layoutBounds.y + layoutInsets.top;
-        for (Figure child : layoutable.getChildren()) {
-            if (child.isVisible()) {
-                Insets2D.Double insets = getInsets(child);
-                double height = child.getPreferredSize().height;
-                double width = child.getPreferredSize().width;
-                switch (compositeAlignment) {
-                    case LEADING:
-                        child.setBounds(
-                                new Point2D.Double(
-                                layoutBounds.x + layoutInsets.left + insets.left,
-                                y + insets.top),
-                                new Point2D.Double(
-                                layoutBounds.x + + layoutInsets.left + insets.left + width,
-                                y + insets.top + height));
-                        break;
-                    case TRAILING:
-                        child.setBounds(
-                                new Point2D.Double(
-                                layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right - width, 
-                                y + insets.top),
-                                new Point2D.Double(
-                                layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
-                                y + insets.top + height));
-                        break;
-                    case CENTER:
-                        child.setBounds(
-                                new Point2D.Double(
-                                layoutBounds.x + (layoutBounds.width - width) / 2d, 
-                                y + insets.top),
-                                new Point2D.Double(
-                                layoutBounds.x + (layoutBounds.width + width) / 2d, 
-                                y + insets.top + height));
-                        break;
-                    case BLOCK:
-                    default:
-                        child.setBounds(
-                                new Point2D.Double(
-                                layoutBounds.x + layoutInsets.left + insets.left,
-                                y + insets.top),
-                                new Point2D.Double(
-                                layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
-                                y + insets.top + height));
-                        break;
-                }
-                y += height + insets.top + insets.bottom;
-            }
-        }
+        double y = y(layoutable, anchor, lead);
+		Rectangle2D.Double layoutBounds = calculateLayout(layoutable, anchor, lead);
         return layoutBounds;
     }
+
+	private double y(CompositeFigure layoutable, Point2D.Double anchor, Point2D.Double lead) {
+		Insets2D.Double layoutInsets = layoutInsets(layoutable);
+		Alignment compositeAlignment = layoutable.get(COMPOSITE_ALIGNMENT);
+		Rectangle2D.Double layoutBounds = calculateLayout(layoutable, anchor, lead);
+		double y = layoutBounds.y + layoutInsets.top;
+		for (Figure child : layoutable.getChildren()) {
+			if (child.isVisible()) {
+				Insets2D.Double insets = getInsets(child);
+				double height = child.getPreferredSize().height;
+				double width = child.getPreferredSize().width;
+				switch (compositeAlignment) {
+				case LEADING:
+					child.setBounds(
+							new Point2D.Double(layoutBounds.x + layoutInsets.left + insets.left, y + insets.top),
+							new Point2D.Double(layoutBounds.x + +layoutInsets.left + insets.left + width,
+									y + insets.top + height));
+					break;
+				case TRAILING:
+					child.setBounds(
+							new Point2D.Double(
+									layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right - width,
+									y + insets.top),
+							new Point2D.Double(layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
+									y + insets.top + height));
+					break;
+				case CENTER:
+					child.setBounds(
+							new Point2D.Double(layoutBounds.x + (layoutBounds.width - width) / 2d, y + insets.top),
+							new Point2D.Double(layoutBounds.x + (layoutBounds.width + width) / 2d,
+									y + insets.top + height));
+					break;
+				case BLOCK:
+				default:
+					child.setBounds(
+							new Point2D.Double(layoutBounds.x + layoutInsets.left + insets.left, y + insets.top),
+							new Point2D.Double(layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
+									y + insets.top + height));
+					break;
+				}
+				y += height + insets.top + insets.bottom;
+			}
+		}
+		return y;
+	}
+
+	private Insets2D.Double layoutInsets(CompositeFigure layoutable) {
+		Insets2D.Double layoutInsets = layoutable.get(LAYOUT_INSETS);
+		if (layoutInsets == null) {
+			layoutInsets = new Insets2D.Double();
+		}
+		return layoutInsets;
+	}
 }
