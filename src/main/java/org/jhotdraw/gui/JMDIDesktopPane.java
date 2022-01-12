@@ -82,11 +82,8 @@ public class JMDIDesktopPane extends JDesktopPane implements Arrangeable {
         int x = insets.left;
         int y = insets.top;
         int frameOffset=0;
-        for (int i = allFrames.length - 1; i >= 0; i--) {
-            Point p=SwingUtilities.convertPoint(allFrames[i].getContentPane(),0,0,allFrames[i]);
-            frameOffset=Math.max(frameOffset,Math.max(p.x,p.y));
-        }
-        int frameHeight = (getBounds().height-insets.top-insets.bottom) - allFrames.length * frameOffset;
+        frameOffset = frameOffset(allFrames, frameOffset);
+		int frameHeight = (getBounds().height-insets.top-insets.bottom) - allFrames.length * frameOffset;
         int frameWidth = (getBounds().width-insets.left-insets.right) - allFrames.length * frameOffset;
         for (int i = allFrames.length - 1; i >= 0; i--) {
             try {
@@ -102,6 +99,14 @@ public class JMDIDesktopPane extends JDesktopPane implements Arrangeable {
         
         checkDesktopSize();
     }
+
+	private int frameOffset(JInternalFrame[] allFrames, int frameOffset) {
+		for (int i = allFrames.length - 1; i >= 0; i--) {
+			Point p = SwingUtilities.convertPoint(allFrames[i].getContentPane(), 0, 0, allFrames[i]);
+			frameOffset = Math.max(frameOffset, Math.max(p.x, p.y));
+		}
+		return frameOffset;
+	}
     
     private void tileFramesHorizontally() {
         Component[] allFrames = getAllFrames();

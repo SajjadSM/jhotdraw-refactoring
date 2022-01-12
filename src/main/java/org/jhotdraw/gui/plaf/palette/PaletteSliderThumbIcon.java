@@ -89,12 +89,10 @@ public class PaletteSliderThumbIcon extends MultiIcon {
     
     @Override
     protected void generateMissingIcons() {
-        Icon[] oldIcons;
-        if (icons.length != 6) {
-            oldIcons = new Icon[6];
+        Icon[] oldIcons = oldIcons();
+		if (icons.length != 6) {
             System.arraycopy(icons, 0, oldIcons, 0, Math.min(icons.length, 6));
         } else {
-            oldIcons = icons;
         }
         if (icons[EP] == null) {
             icons[EP] = icons[E];
@@ -109,6 +107,15 @@ public class PaletteSliderThumbIcon extends MultiIcon {
             icons[DI] = icons[D];
         }
     }
+	private Icon[] oldIcons() {
+		Icon[] oldIcons;
+		if (icons.length != 6) {
+			oldIcons = new Icon[6];
+		} else {
+			oldIcons = icons;
+		}
+		return oldIcons;
+	}
     
     protected Icon getIcon(Component c) {
         Icon icon;

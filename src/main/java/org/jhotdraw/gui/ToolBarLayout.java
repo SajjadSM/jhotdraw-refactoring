@@ -102,29 +102,48 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
 
     @Override
     public Dimension preferredLayoutSize(Container parent) {
-        int w = 0;
-        int h = 0;
-        switch (axis) {
-            case Y_AXIS:
-                for (Component c : parent.getComponents()) {
-                    Dimension ps = c.getPreferredSize();
-                    w = Math.max(w, ps.width);
-                    h += ps.height;
-                }
-                break;
-            case X_AXIS:
-            default:
-                for (Component c : parent.getComponents()) {
-                    Dimension ps = c.getPreferredSize();
-                    h = Math.max(h, ps.height);
-                    w += ps.width;
-                }
-        }
-        
-        Insets i = parent.getInsets();
+        int w = w(parent);
+		int h = h(parent);
+		Insets i = parent.getInsets();
         
         return new Dimension(w + i.left + i.right, h + i.top + i.bottom);
     }
+	private int w(Container parent) {
+		int w = 0;
+		switch (axis) {
+		case Y_AXIS:
+			for (Component c : parent.getComponents()) {
+				Dimension ps = c.getPreferredSize();
+				w = Math.max(w, ps.width);
+			}
+			break;
+		case X_AXIS:
+		default:
+			for (Component c : parent.getComponents()) {
+				Dimension ps = c.getPreferredSize();
+				w += ps.width;
+			}
+		}
+		return w;
+	}
+	private int h(Container parent) {
+		int h = 0;
+		switch (axis) {
+		case Y_AXIS:
+			for (Component c : parent.getComponents()) {
+				Dimension ps = c.getPreferredSize();
+				h += ps.height;
+			}
+			break;
+		case X_AXIS:
+		default:
+			for (Component c : parent.getComponents()) {
+				Dimension ps = c.getPreferredSize();
+				h = Math.max(h, ps.height);
+			}
+		}
+		return h;
+	}
 
     @Override
     public Dimension minimumLayoutSize(Container parent) {

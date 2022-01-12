@@ -48,18 +48,23 @@ tabbedPane.putClientProperty("Palette.TabbedPane.paintContentBorder", false);
     }
     
     public void addColorChooserPanel(final AbstractColorChooserPanel ccp) {
-        final String displayName = ccp.getDisplayName();
+        tabbedPane2(ccp);
+		final String displayName = ccp.getDisplayName();
         if (displayName == null) {
             // Return if we haven't initialized yet
             return;
         }
         
         {
-            JPanel centerView = new JPanel(new BorderLayout());
-            centerView.add(ccp);
-            tabbedPane.add(centerView, displayName);
         }
     }
+
+	private void tabbedPane2(final AbstractColorChooserPanel ccp) {
+		final String displayName = ccp.getDisplayName();
+		JPanel centerView = new JPanel(new BorderLayout());
+		centerView.add(ccp);
+		tabbedPane.add(centerView, displayName);
+	}
     public void removeAllColorChooserPanels() {
         tabbedPane.removeAll();
     }
@@ -73,13 +78,16 @@ tabbedPane.putClientProperty("Palette.TabbedPane.paintContentBorder", false);
     private void initComponents() {
 
         toolBarButtonGroup = new javax.swing.ButtonGroup();
-        tabbedPane = new javax.swing.JTabbedPane();
+        tabbedPane();
+		setLayout(new java.awt.BorderLayout());
 
-        setLayout(new java.awt.BorderLayout());
-
-        tabbedPane.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
         add(tabbedPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+	private void tabbedPane() {
+		tabbedPane = new javax.swing.JTabbedPane();
+		tabbedPane.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
+	}
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

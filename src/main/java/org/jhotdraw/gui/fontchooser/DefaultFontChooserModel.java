@@ -64,20 +64,9 @@ public class DefaultFontChooserModel extends AbstractFontChooserModel {
     public void setFonts(Font[] fonts) {
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.gui.Labels");
 
-        // collect families and sort them alphabetically
+        HashMap<String, FontFamilyNode> familyMap = familyMap(fonts);
+		// collect families and sort them alphabetically
         ArrayList<FontFamilyNode> families = new ArrayList<FontFamilyNode>();
-        HashMap<String, FontFamilyNode> familyMap = new HashMap<String, FontFamilyNode>();
-        for (Font f : fonts) {
-            String familyName = f.getFamily();
-            FontFamilyNode family;
-            if (familyMap.containsKey(familyName)) {
-                family = familyMap.get(familyName);
-            } else {
-                family = new FontFamilyNode(familyName);
-                familyMap.put(familyName, family);
-            }
-            family.add(new FontFaceNode(f));
-        }
         families.addAll(familyMap.values());
         Collections.sort(families);
 
@@ -527,6 +516,29 @@ public class DefaultFontChooserModel extends AbstractFontChooserModel {
 
         fireTreeStructureChanged(this, new TreePath(root));
     }
+
+	private HashMap<String, FontFamilyNode> familyMap(Font[] fonts) {
+		ArrayList<FontFamilyNode> families = new ArrayList<FontFamilyNode>();
+		HashMap<String, FontFamilyNode> familyMap = new HashMap<String, FontFamilyNode>();
+		for (Font f : fonts) {
+			FontFamilyNode family = family(familyMap, f);
+		}
+		families.addAll(familyMap.values());
+		return familyMap;
+	}
+
+	private FontFamilyNode family(HashMap<String, FontFamilyNode> familyMap, Font f) {
+		String familyName = f.getFamily();
+		FontFamilyNode family;
+		if (familyMap.containsKey(familyName)) {
+			family = familyMap.get(familyName);
+		} else {
+			family = new FontFamilyNode(familyName);
+			familyMap.put(familyName, family);
+		}
+		family.add(new FontFaceNode(f));
+		return family;
+	}
 
     protected ArrayList<FontFamilyNode> collectFamiliesNamed(ArrayList<FontFamilyNode> families, String... names) {
         ArrayList<FontFamilyNode> coll = new ArrayList<FontFamilyNode>();

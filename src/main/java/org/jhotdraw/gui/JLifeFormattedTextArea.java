@@ -40,25 +40,24 @@ public class JLifeFormattedTextArea extends JTextArea {
     public void setDocument(Document newValue) {
         super.setDocument(newValue);
 
-        // We must check for null here, because setDocument is called in the
-        // super class constructor.
-        if (formattedTextFieldAdapter == null) {
-            formattedTextFieldAdapter = new JLifeFormattedTextField();
-            handler = new PropertyChangeListener() {
-
-    @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getSource() == formattedTextFieldAdapter &&//
-                            evt.getPropertyName() == "value") {
-                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-                    }
-                }
-            };
-            formattedTextFieldAdapter.addPropertyChangeListener(handler);
-        }
-
-        formattedTextFieldAdapter.setDocument(newValue);
+        formattedTextFieldAdapter(newValue);
     }
+
+	private void formattedTextFieldAdapter(Document newValue) {
+		if (formattedTextFieldAdapter == null) {
+			formattedTextFieldAdapter = new JLifeFormattedTextField();
+			handler = new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					if (evt.getSource() == formattedTextFieldAdapter && evt.getPropertyName() == "value") {
+						firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+					}
+				}
+			};
+			formattedTextFieldAdapter.addPropertyChangeListener(handler);
+		}
+		formattedTextFieldAdapter.setDocument(newValue);
+	}
 
     public void setValue(Object value) {
         formattedTextFieldAdapter.setValue(value);

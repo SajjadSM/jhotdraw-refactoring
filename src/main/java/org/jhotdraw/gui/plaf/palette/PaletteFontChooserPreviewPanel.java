@@ -40,10 +40,14 @@ public class PaletteFontChooserPreviewPanel extends javax.swing.JPanel {
             previewLabel.setText((String) PaletteLookAndFeel.getInstance().get("FontChooser.nothingSelected"));
             previewLabel.setFont(getFont());
         } else {
-        previewLabel.setText(beautifyName(newValue.getFontName()));
-        previewLabel.setFont(newValue.deriveFont(24f));
+        newValue(newValue);
         }
     }
+
+	private void newValue(Font newValue) {
+		previewLabel.setText(beautifyName(newValue.getFontName()));
+		previewLabel.setFont(newValue.deriveFont(24f));
+	}
     
     private String beautifyName(String name) {
 
@@ -74,13 +78,16 @@ public class PaletteFontChooserPreviewPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        previewLabel = new javax.swing.JLabel();
+        previewLabel();
+		setLayout(new java.awt.BorderLayout());
 
-        setLayout(new java.awt.BorderLayout());
-
-        previewLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         add(previewLabel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+	private void previewLabel() {
+		previewLabel = new javax.swing.JLabel();
+		previewLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+	}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

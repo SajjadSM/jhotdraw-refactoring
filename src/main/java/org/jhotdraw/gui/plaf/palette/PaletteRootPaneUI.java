@@ -154,9 +154,9 @@ public class PaletteRootPaneUI extends BasicRootPaneUI {
             JLayeredPane layeredPane = rootPane.getLayeredPane();
             Component glassPane = rootPane.getGlassPane();
             Container contentPane = rootPane.getContentPane();
-            JMenuBar menuBar = rootPane.getJMenuBar();
+            int contentY = contentY();
+			JMenuBar menuBar = rootPane.getJMenuBar();
 
-            int contentY = 0;
             int w = b.width - i.right - i.left;
             int h = b.height - i.top - i.bottom;
 
@@ -171,12 +171,21 @@ public class PaletteRootPaneUI extends BasicRootPaneUI {
             if (menuBar != null && menuBar.isVisible()) {
                 Dimension mbd = menuBar.getPreferredSize();
                 menuBar.setBounds(0, 0, w, mbd.height);
-                contentY += mbd.height;
             }
             if (contentPane != null) {
                 contentPane.setBounds(0, contentY, w, h - contentY);
             }
         }
+
+		private int contentY() {
+			JMenuBar menuBar = rootPane.getJMenuBar();
+			int contentY = 0;
+			if (menuBar != null && menuBar.isVisible()) {
+				Dimension mbd = menuBar.getPreferredSize();
+				contentY += mbd.height;
+			}
+			return contentY;
+		}
 
         public void addLayoutComponent(String name, Component comp) {
         }
