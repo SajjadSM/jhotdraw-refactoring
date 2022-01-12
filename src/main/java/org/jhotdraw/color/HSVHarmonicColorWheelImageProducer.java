@@ -126,19 +126,24 @@ public class HSVHarmonicColorWheelImageProducer extends PolarColorWheelImageProd
 
     @Override
     public void generateColorWheel() {
-        float[] components = new float[3];
-        float[] rgb = new float[3];
-        for (int index = 0; index < pixels.length; index++) {
-            if (alphas[index] != 0) {
-                components[0] = angulars[index];
-                components[1] = radials[index];
-                components[2] = brights[index];
-                pixels[index] = alphas[index] | 0xffffff & ColorUtil.CStoRGB24(colorSpace, components, rgb);
-            }
-        }
-        newPixels();
+        float[] components = components();
+		newPixels();
         isPixelsValid = false;
     }
+
+	private float[] components() {
+		float[] components = new float[3];
+		float[] rgb = new float[3];
+		for (int index = 0; index < pixels.length; index++) {
+			if (alphas[index] != 0) {
+				components[0] = angulars[index];
+				components[1] = radials[index];
+				components[2] = brights[index];
+				pixels[index] = alphas[index] | 0xffffff & ColorUtil.CStoRGB24(colorSpace, components, rgb);
+			}
+		}
+		return components;
+	}
 
     @Override
     public Point getColorLocation(Color c) {

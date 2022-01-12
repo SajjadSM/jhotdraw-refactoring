@@ -126,21 +126,22 @@ public abstract class AbstractRotateHandle extends AbstractHandle {
     @Override
     public void trackStep(Point anchor, Point lead, int modifiersEx) {
         location = new Point(lead.x, lead.y);
-        Point2D.Double leadPoint = view.viewToDrawing(lead);
-        double stepTheta = Geom.angle(center.x, center.y, leadPoint.x, leadPoint.y);
-
-        double currentTheta = view.getConstrainer().constrainAngle(stepTheta - startTheta);
-
-        transform.setToIdentity();
-        transform.translate(center.x, center.y);
-        transform.rotate(currentTheta);
-        transform.translate(-center.x, -center.y);
-
-        getOwner().willChange();
+        transform(lead);
+		getOwner().willChange();
         getOwner().restoreTransformTo(restoreData);
         getOwner().transform(transform);
         getOwner().changed();
     }
+
+	private void transform(Point lead) {
+		Point2D.Double leadPoint = view.viewToDrawing(lead);
+		double stepTheta = Geom.angle(center.x, center.y, leadPoint.x, leadPoint.y);
+		double currentTheta = view.getConstrainer().constrainAngle(stepTheta - startTheta);
+		transform.setToIdentity();
+		transform.translate(center.x, center.y);
+		transform.rotate(currentTheta);
+		transform.translate(-center.x, -center.y);
+	}
 
     @Override
     public void trackEnd(Point anchor, Point lead, int modifiersEx) {
@@ -157,25 +158,29 @@ public abstract class AbstractRotateHandle extends AbstractHandle {
         Figure f = getOwner();
         center = getCenter();
         if (f.isTransformable()) {
-            AffineTransform tx = new AffineTransform();
-
-            switch (evt.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                case KeyEvent.VK_LEFT:
-                    tx.rotate(-1d / 180d * Math.PI, center.x, center.y);
-                    evt.consume();
-                    break;
-                case KeyEvent.VK_DOWN:
-                case KeyEvent.VK_RIGHT:
-                    tx.rotate(1d / 180d * Math.PI, center.x, center.y);
-                    evt.consume();
-                    break;
-            }
-            f.willChange();
-            f.transform(tx);
-            f.changed();
-            fireUndoableEditHappened(
+            AffineTransform tx = tx(evt, f);
+			fireUndoableEditHappened(
                     new TransformEdit(f, tx));
         }
     }
+
+	private AffineTransform tx(KeyEvent evt, Figure f) {
+		AffineTransform tx = new AffineTransform();
+		switch (evt.getKeyCode()) {
+		case KeyEvent.VK_UP:
+		case KeyEvent.VK_LEFT:
+			tx.rotate(-1d / 180d * Math.PI, center.x, center.y);
+			evt.consume();
+			break;
+		case KeyEvent.VK_DOWN:
+		case KeyEvent.VK_RIGHT:
+			tx.rotate(1d / 180d * Math.PI, center.x, center.y);
+			evt.consume();
+			break;
+		}
+		f.willChange();
+		f.transform(tx);
+		f.changed();
+		return tx;
+	}
 }

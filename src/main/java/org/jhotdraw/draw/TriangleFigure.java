@@ -202,35 +202,39 @@ public class TriangleFigure extends AbstractAttributedFigure {
     }
     @Override
     public Rectangle2D.Double getDrawingArea() {
-        double totalStrokeWidth = AttributeKeys.getStrokeTotalWidth(this);
-        double width = 0d;
-        if (get(STROKE_COLOR) != null) {
-            switch (get(STROKE_PLACEMENT)) {
-                case INSIDE :
-                    width = 0d;
-                    break;
-                case OUTSIDE :
-                    if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                        width = totalStrokeWidth * get(STROKE_MITER_LIMIT);
-                    } else {
-                        width = totalStrokeWidth;
-                    }
-                    break;
-                case CENTER :
-                    if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                        width = totalStrokeWidth / 2d * get(STROKE_MITER_LIMIT);
-                    } else {
-                        width = totalStrokeWidth / 2d;
-                    }
-                    break;
-            }
-        }
-        width++;
-        Rectangle2D.Double r = getBounds();
+        double width = width();
+		Rectangle2D.Double r = getBounds();
         
         Geom.grow(r, width, width);
         return r;
     }
+	private double width() {
+		double totalStrokeWidth = AttributeKeys.getStrokeTotalWidth(this);
+		double width = 0d;
+		if (get(STROKE_COLOR) != null) {
+			switch (get(STROKE_PLACEMENT)) {
+			case INSIDE:
+				width = 0d;
+				break;
+			case OUTSIDE:
+				if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
+					width = totalStrokeWidth * get(STROKE_MITER_LIMIT);
+				} else {
+					width = totalStrokeWidth;
+				}
+				break;
+			case CENTER:
+				if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
+					width = totalStrokeWidth / 2d * get(STROKE_MITER_LIMIT);
+				} else {
+					width = totalStrokeWidth / 2d;
+				}
+				break;
+			}
+		}
+		width++;
+		return width;
+	}
     public Point2D.Double chop(Point2D.Double p) {
         Shape triangle = getBezierPath();
         

@@ -71,13 +71,8 @@ public class ClearSelectionAction extends AbstractSelectionAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        JComponent c = target;
-        if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner() instanceof JComponent)) {
-            c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                    getPermanentFocusOwner();
-        }
-        if (c != null && c.isEnabled()) {
+        JComponent c = actionPerformedExt();
+		if (c != null && c.isEnabled()) {
             if (c instanceof EditableComponent) {
                 ((EditableComponent) c).clearSelection();
             } else if (c instanceof JTextComponent) {
@@ -88,6 +83,15 @@ public class ClearSelectionAction extends AbstractSelectionAction {
             }
         }
     }
+
+	private JComponent actionPerformedExt() {
+		JComponent c = target;
+		if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.getPermanentFocusOwner() instanceof JComponent)) {
+			c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+		}
+		return c;
+	}
 
     @Override
     protected void updateEnabled() {

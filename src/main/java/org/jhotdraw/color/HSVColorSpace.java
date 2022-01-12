@@ -103,7 +103,8 @@ public class HSVColorSpace extends AbstractNamedColorSpace {
 
     @Override
     public float[] fromRGB(float[] rgbvalue, float[] component) {
-        float r = rgbvalue[0];
+        float saturation = saturation(rgbvalue);
+		float r = rgbvalue[0];
         float g = rgbvalue[1];
         float b = rgbvalue[2];
 
@@ -111,7 +112,6 @@ public class HSVColorSpace extends AbstractNamedColorSpace {
         float min = Math.min(Math.min(r, g), b);
 
         float hue;
-        float saturation;
         float value;
 
         if (max == min) {
@@ -128,17 +128,26 @@ public class HSVColorSpace extends AbstractNamedColorSpace {
 
         value = max;
 
-        if (max == 0) {
-            saturation = 0;
-        } else {
-            saturation = (max - min) / max;
-        }
-
         component[0] = hue / 360f;
         component[1] = saturation;
         component[2] = value;
         return component;
     }
+
+	private float saturation(float[] rgbvalue) {
+		float r = rgbvalue[0];
+		float g = rgbvalue[1];
+		float b = rgbvalue[2];
+		float max = Math.max(Math.max(r, g), b);
+		float min = Math.min(Math.min(r, g), b);
+		float saturation;
+		if (max == 0) {
+			saturation = 0;
+		} else {
+			saturation = (max - min) / max;
+		}
+		return saturation;
+	}
 
     @Override
     public String getName(int idx) {

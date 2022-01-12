@@ -102,13 +102,8 @@ public class DeleteAction extends TextAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        JComponent c = target;
-        if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner() instanceof JComponent)) {
-            c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                    getPermanentFocusOwner();
-        }
-        if (c != null && c.isEnabled()) {
+        JComponent c = aExt();
+		if (c != null && c.isEnabled()) {
             if (c instanceof EditableComponent) {
                 ((EditableComponent) c).delete();
             } else {
@@ -117,12 +112,21 @@ public class DeleteAction extends TextAction {
         }
     }
 
+	private JComponent aExt() {
+		JComponent c = target;
+		if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.getPermanentFocusOwner() instanceof JComponent)) {
+			c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+		}
+		return c;
+	}
+
     /** This method was copied from
      * DefaultEditorKit.DeleteNextCharAction.actionPerformed(ActionEvent).
      */
     public void deleteNextChar(ActionEvent e) {
-        JTextComponent c = getTextComponent(e);
-        boolean beep = true;
+        boolean beep = beepExt(e);
+		JTextComponent c = getTextComponent(e);
         if ((c != null) && (c.isEditable())) {
             try {
                 javax.swing.text.Document doc = c.getDocument();
@@ -131,10 +135,8 @@ public class DeleteAction extends TextAction {
                 int mark = caret.getMark();
                 if (dot != mark) {
                     doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
-                    beep = false;
                 } else if (dot < doc.getLength()) {
                     doc.remove(dot, 1);
-                    beep = false;
                 }
             } catch (BadLocationException bl) {
             }
@@ -143,5 +145,36 @@ public class DeleteAction extends TextAction {
             Toolkit.getDefaultToolkit().beep();
         }
     }
+
+	private boolean beepExt(ActionEvent e) {
+		JTextComponent c = getTextComponent(e);
+		boolean beep = true;
+		if ((c != null) && (c.isEditable())) {
+			javax.swing.text.Document doc = c.getDocument();
+			Caret caret = c.getCaret();
+			int dot = caret.getDot();
+			int mark = caret.getMark();
+			if (dot != mark) {
+				beep = false;
+			} else if (dot < doc.getLength()) {
+				beep = false;
+			}
+			try {
+				doc = c.getDocument();
+				 caret = c.getCaret();
+				dot = caret.getDot();
+				mark = caret.getMark();
+				if (dot != mark) {
+					doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
+					beep = false;
+				} else if (dot < doc.getLength()) {
+					doc.remove(dot, 1);
+					beep = false;
+				}
+			} catch (BadLocationException bl) {
+			}
+		}
+		return beep;
+	}
 }
 

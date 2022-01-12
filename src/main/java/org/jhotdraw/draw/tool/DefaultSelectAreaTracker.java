@@ -105,34 +105,39 @@ public class DefaultSelectAreaTracker extends AbstractTool implements SelectArea
     @Override
     public void mouseMoved(MouseEvent evt) {
         clearRubberBand();
-        Point point = evt.getPoint();
-        DrawingView view = editor.findView((Container) evt.getSource());
-        updateCursor(view, point);
+        DrawingView view = view(evt);
+		Point point = evt.getPoint();
         if (view == null || editor.getActiveView() != view) {
             clearHoverHandles();
         } else {
-            // Search first, if one of the selected figures contains
-            // the current mouse location, and is selectable. 
-            // Only then search for other
-            // figures. This search sequence is consistent with the
-            // search sequence of the SelectionTool.
-            Figure figure = null;
-            Point2D.Double p = view.viewToDrawing(point);
-            for (Figure f : view.getSelectedFigures()) {
-                if (f.contains(p)) {
-                    figure = f;
-                }
-            }
-            if (figure == null) {
-                figure = view.findFigure(point);
-                while (figure != null && !figure.isSelectable()) {
-                    figure = view.getDrawing().findFigureBehind(p, figure);
-                }
-            }
-
-            updateHoverHandles(view, figure);
+            Figure figure = figure(point, view);
+			updateHoverHandles(view, figure);
         }
     }
+
+	private DrawingView view(MouseEvent evt) {
+		Point point = evt.getPoint();
+		DrawingView view = editor.findView((Container) evt.getSource());
+		updateCursor(view, point);
+		return view;
+	}
+
+	private Figure figure(Point point, DrawingView view) {
+		Figure figure = null;
+		Point2D.Double p = view.viewToDrawing(point);
+		for (Figure f : view.getSelectedFigures()) {
+			if (f.contains(p)) {
+				figure = f;
+			}
+		}
+		if (figure == null) {
+			figure = view.findFigure(point);
+			while (figure != null && !figure.isSelectable()) {
+				figure = view.getDrawing().findFigureBehind(p, figure);
+			}
+		}
+		return figure;
+	}
 
     @Override
     public void mouseExited(MouseEvent evt) {

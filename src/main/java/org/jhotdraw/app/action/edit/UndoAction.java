@@ -59,13 +59,18 @@ public class UndoAction extends AbstractViewAction {
     }
 
     protected void updateEnabledState() {
-        boolean isEnabled = false;
-        Action realAction = getRealUndoAction();
-        if (realAction != null && realAction != this) {
-            isEnabled = realAction.isEnabled();
-        }
-        setEnabled(isEnabled);
+        boolean isEnabled = isEnabled();
+		setEnabled(isEnabled);
     }
+
+	public boolean isEnabled() {
+		boolean isEnabled = false;
+		Action realAction = getRealUndoAction();
+		if (realAction != null && realAction != this) {
+			isEnabled = realAction.isEnabled();
+		}
+		return isEnabled;
+	}
 
     @Override
     protected void updateView(@Nullable View oldValue, @Nullable View newValue) {

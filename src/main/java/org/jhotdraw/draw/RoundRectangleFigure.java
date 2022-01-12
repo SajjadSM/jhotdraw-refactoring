@@ -211,9 +211,13 @@ public class RoundRectangleFigure extends AbstractAttributedFigure {
     @Override
     public void read(DOMInput in) throws IOException {
         super.read(in);
-        roundrect.arcwidth = in.getAttribute("arcWidth", DEFAULT_ARC);
-        roundrect.archeight = in.getAttribute("arcHeight", DEFAULT_ARC);
+        roundrect(in);
     }
+
+	private void roundrect(DOMInput in) {
+		roundrect.arcwidth = in.getAttribute("arcWidth", DEFAULT_ARC);
+		roundrect.archeight = in.getAttribute("arcHeight", DEFAULT_ARC);
+	}
 
     @Override
     public void write(DOMOutput out) throws IOException {

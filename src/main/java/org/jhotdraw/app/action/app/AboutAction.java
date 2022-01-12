@@ -45,16 +45,8 @@ public class AboutAction extends AbstractApplicationAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        Application app = getApplication();
-
-        Component c = app.getComponent();
-
-        // This ensures that we open the option pane on the center of the screen
-        // on Mac OS X.
-        if (c == null || c.getBounds().isEmpty()) {
-            c = null;
-        }
-
+        Component c = c();
+		Application app = getApplication();
 
         JOptionPane.showMessageDialog(c,
                 "<html>" + UIManager.getString("OptionPane.css")
@@ -68,4 +60,13 @@ public class AboutAction extends AbstractApplicationAction {
                 + ", " + System.getProperty("os.arch"),
                 "About", JOptionPane.PLAIN_MESSAGE);
     }
+
+	private Component c() {
+		Application app = getApplication();
+		Component c = app.getComponent();
+		if (c == null || c.getBounds().isEmpty()) {
+			c = null;
+		}
+		return c;
+	}
 }

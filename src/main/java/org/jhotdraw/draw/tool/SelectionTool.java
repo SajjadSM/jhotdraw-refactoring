@@ -285,24 +285,32 @@ public class SelectionTool extends AbstractTool {
                 }
             }
 
-            if (newTracker != null) {
-                setTracker(newTracker);
-            }
-            tracker.mousePressed(evt);
+            tracker(newTracker);
+			tracker.mousePressed(evt);
         }
     }
+
+	private void tracker(Tool newTracker) {
+		if (newTracker != null) {
+			setTracker(newTracker);
+		}
+	}
 
     protected void setTracker(Tool newTracker) {
         if (tracker != null) {
             tracker.deactivate(getEditor());
             tracker.removeToolListener(trackerHandler);
         }
-        tracker = newTracker;
-        if (tracker != null) {
-            tracker.activate(getEditor());
-            tracker.addToolListener(trackerHandler);
-        }
+        newTracker(newTracker);
     }
+
+	private void newTracker(Tool newTracker) {
+		tracker = newTracker;
+		if (tracker != null) {
+			tracker.activate(getEditor());
+			tracker.addToolListener(trackerHandler);
+		}
+	}
 
     /**
      * Method to get a {@code HandleTracker} which handles user interaction

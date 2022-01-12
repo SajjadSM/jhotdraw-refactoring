@@ -70,19 +70,24 @@ public class DrawingComponentRepainter extends FigureAdapter
             }
             component.repaint();
         } else if (name == DrawingView.DRAWING_PROPERTY) {
-            Drawing drawing = (Drawing) evt.getOldValue();
-            if (drawing != null) {
-                drawing.removeFigureListener(this);
-            }
-            drawing = (Drawing) evt.getNewValue();
-            if (drawing != null) {
-                drawing.addFigureListener(this);
-            }
-            component.repaint();
+            Drawing drawing = drawing(evt);
+			component.repaint();
         } else {
             component.repaint();
         }
     }
+
+	private Drawing drawing(PropertyChangeEvent evt) {
+		Drawing drawing = (Drawing) evt.getOldValue();
+		if (drawing != null) {
+			drawing.removeFigureListener(this);
+		}
+		drawing = (Drawing) evt.getNewValue();
+		if (drawing != null) {
+			drawing.addFigureListener(this);
+		}
+		return drawing;
+	}
 
     @Override
     public void dispose() {

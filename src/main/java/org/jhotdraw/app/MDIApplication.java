@@ -272,21 +272,6 @@ public class MDIApplication extends AbstractApplication {
             PreferencesUtil.installInternalFramePrefsHandler(prefs, "view", f, desktopPane);
             Point loc = new Point(desktopPane.getInsets().left, desktopPane.getInsets().top);
             boolean moved;
-            do {
-                moved = false;
-                for (Iterator i = views().iterator(); i.hasNext();) {
-                    View aView = (View) i.next();
-                    if (aView != v && aView.isShowing()
-                            && SwingUtilities.getRootPane(aView.getComponent()).getParent().
-                            getLocation().equals(loc)) {
-                        Point offset = SwingUtilities.convertPoint(SwingUtilities.getRootPane(aView.getComponent()), 0, 0, SwingUtilities.getRootPane(aView.getComponent()).getParent());
-                        loc.x += Math.max(offset.x, offset.y);
-                        loc.y += Math.max(offset.x, offset.y);
-                        moved = true;
-                        break;
-                    }
-                }
-            } while (moved);
             f.setLocation(loc);
 
             //paletteHandler.add(f, v);
@@ -303,18 +288,6 @@ public class MDIApplication extends AbstractApplication {
                 @Override
                 public void internalFrameClosed(final InternalFrameEvent evt) {
                     v.stop();
-                }
-            });
-
-            v.addPropertyChangeListener(new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    String name = evt.getPropertyName();
-                    if (name == View.HAS_UNSAVED_CHANGES_PROPERTY
-                            || name == View.URI_PROPERTY) {
-                        updateViewTitle(v, f);
-                    }
                 }
             });
 
@@ -357,6 +330,34 @@ public class MDIApplication extends AbstractApplication {
             v.start();
         }
     }
+
+	private boolean moved(final View v, final JInternalFrame f, Point loc, boolean moved) {
+		do {
+			moved = false;
+			for (Iterator i = views().iterator(); i.hasNext();) {
+				View aView = (View) i.next();
+				if (aView != v && aView.isShowing()
+						&& SwingUtilities.getRootPane(aView.getComponent()).getParent().getLocation().equals(loc)) {
+					Point offset = SwingUtilities.convertPoint(SwingUtilities.getRootPane(aView.getComponent()), 0, 0,
+							SwingUtilities.getRootPane(aView.getComponent()).getParent());
+					loc.x += Math.max(offset.x, offset.y);
+					loc.y += Math.max(offset.x, offset.y);
+					moved = true;
+					break;
+				}
+			}
+		} while (moved);
+		v.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String name = evt.getPropertyName();
+				if (name == View.HAS_UNSAVED_CHANGES_PROPERTY || name == View.URI_PROPERTY) {
+					updateViewTitle(v, f);
+				}
+			}
+		});
+		return moved;
+	}
 
     @Override
     public void hide(View v) {

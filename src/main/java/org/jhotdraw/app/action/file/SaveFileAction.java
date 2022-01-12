@@ -84,56 +84,61 @@ public class SaveFileAction extends AbstractViewAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final View view = getActiveView();
-        if (view == null) {
+        View view = view();
+		if (view == null) {
             return;
         }
         if (view.isEnabled()) {
-            oldFocusOwner = SwingUtilities.getWindowAncestor(view.getComponent()).getFocusOwner();
             view.setEnabled(false);
-
-            if (!saveAs && view.getURI() != null && view.canSaveTo(view.getURI())) {
-                saveViewToURI(view, view.getURI(), null);
-            } else {
-                URIChooser fileChooser = getChooser(view);
-
-                JSheet.showSaveSheet(fileChooser, view.getComponent(), new SheetListener() {
-
-                    @Override
-                    public void optionSelected(final SheetEvent evt) {
-                        if (evt.getOption() == JFileChooser.APPROVE_OPTION) {
-                            final URI uri;
-                            if ((evt.getChooser() instanceof JFileURIChooser) && (evt.getFileChooser().getFileFilter() instanceof ExtensionFileFilter)) {
-                                uri = ((ExtensionFileFilter) evt.getFileChooser().getFileFilter()).makeAcceptable(evt.getFileChooser().getSelectedFile()).toURI();
-                            } else {
-                                uri = evt.getChooser().getSelectedURI();
-                            }
-
-                            // Prevent same URI from being opened more than once
-                            if (!getApplication().getModel().isAllowMultipleViewsPerURI()) {
-                                for (View v : getApplication().getViews()) {
-                                    if (v != view && v.getURI() != null && v.getURI().equals(uri)) {
-                                        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.app.Labels");
-                                        JSheet.showMessageSheet(view.getComponent(), labels.getFormatted("file.saveAs.couldntSaveIntoOpenFile.message", evt.getFileChooser().getSelectedFile().getName()));
-
-                                        view.setEnabled(true);
-                                        return;
-                                    }
-                                }
-                            }
-
-                            saveViewToURI(view, uri, evt.getChooser());
-                        } else {
-                            view.setEnabled(true);
-                            if (oldFocusOwner != null) {
-                                oldFocusOwner.requestFocus();
-                            }
-                        }
-                    }
-                });
-            }
         }
     }
+
+	private View view() throws java.util.MissingResourceException {
+		final View view = getActiveView();
+		if (view.isEnabled()) {
+			oldFocusOwner = SwingUtilities.getWindowAncestor(view.getComponent()).getFocusOwner();
+			if (!saveAs && view.getURI() != null && view.canSaveTo(view.getURI())) {
+				saveViewToURI(view, view.getURI(), null);
+			} else {
+				URIChooser fileChooser = getChooser(view);
+				JSheet.showSaveSheet(fileChooser, view.getComponent(), new SheetListener() {
+					@Override
+					public void optionSelected(final SheetEvent evt) {
+						if (evt.getOption() == JFileChooser.APPROVE_OPTION) {
+							final URI uri;
+							if ((evt.getChooser() instanceof JFileURIChooser)
+									&& (evt.getFileChooser().getFileFilter() instanceof ExtensionFileFilter)) {
+								uri = ((ExtensionFileFilter) evt.getFileChooser().getFileFilter())
+										.makeAcceptable(evt.getFileChooser().getSelectedFile()).toURI();
+							} else {
+								uri = evt.getChooser().getSelectedURI();
+							}
+							if (!getApplication().getModel().isAllowMultipleViewsPerURI()) {
+								for (View v : getApplication().getViews()) {
+									if (v != view && v.getURI() != null && v.getURI().equals(uri)) {
+										ResourceBundleUtil labels = ResourceBundleUtil
+												.getBundle("org.jhotdraw.app.Labels");
+										JSheet.showMessageSheet(view.getComponent(),
+												labels.getFormatted("file.saveAs.couldntSaveIntoOpenFile.message",
+														evt.getFileChooser().getSelectedFile().getName()));
+										view.setEnabled(true);
+										return;
+									}
+								}
+							}
+							saveViewToURI(view, uri, evt.getChooser());
+						} else {
+							view.setEnabled(true);
+							if (oldFocusOwner != null) {
+								oldFocusOwner.requestFocus();
+							}
+						}
+					}
+				});
+			}
+		}
+		return view;
+	}
 
     protected void saveViewToURI(final View view, final URI file,
             @Nullable final URIChooser chooser) {

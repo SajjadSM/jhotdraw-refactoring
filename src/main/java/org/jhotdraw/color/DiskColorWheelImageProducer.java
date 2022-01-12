@@ -76,9 +76,8 @@ public class DiskColorWheelImageProducer extends AbstractColorWheelImageProducer
         float extentY = extentX;
         */
         for (int x = 0; x < w; x++) {
-            float kx = (x - cx)/radius;
-            if (flipX) kx=-kx; 
-            float squarekx=kx*kx;
+            float kx = kx(radius, cx, x);
+			float squarekx=kx*kx;
 
             for (int y = 0; y < h; y++) {
                 float ky = (y - cy)/radius;
@@ -109,6 +108,12 @@ public class DiskColorWheelImageProducer extends AbstractColorWheelImageProducer
         }
         isLookupValid = true;
     }
+	private float kx(float radius, float cx, int x) {
+		float kx = (x - cx) / radius;
+		if (flipX)
+			kx = -kx;
+		return kx;
+	}
     protected void generateLookupTablesOLD() {
         radials = new float[w * h];
         angulars = new float[w * h];

@@ -61,15 +61,20 @@ public abstract class AbstractDrawing extends AbstractAttributedCompositeFigure 
             // Process the listeners last to first, notifying
             // those that are interested in this event
             for (int i = listeners.length - 2; i >= 0; i -= 2) {
-                if (event == null) {
-                    event = new UndoableEditEvent(this, edit);
-                }
-                if (listeners[i] == UndoableEditListener.class) {
+                event = event(edit, event);
+				if (listeners[i] == UndoableEditListener.class) {
                     ((UndoableEditListener) listeners[i + 1]).undoableEditHappened(event);
                 }
             }
         }
     }
+
+	private UndoableEditEvent event(UndoableEdit edit, UndoableEditEvent event) {
+		if (event == null) {
+			event = new UndoableEditEvent(this, edit);
+		}
+		return event;
+	}
 
     @Override
     public FontRenderContext getFontRenderContext() {

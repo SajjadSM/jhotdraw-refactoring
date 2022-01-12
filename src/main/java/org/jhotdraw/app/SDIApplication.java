@@ -207,21 +207,6 @@ public class SDIApplication extends AbstractApplication {
             PreferencesUtil.installFramePrefsHandler(prefs, "view", f);
             Point loc = f.getLocation();
             boolean moved;
-            do {
-                moved = false;
-                for (Iterator i = views().iterator(); i.hasNext();) {
-                    View aView = (View) i.next();
-                    if (aView != view
-                            && SwingUtilities.getWindowAncestor(aView.getComponent()) != null
-                            && SwingUtilities.getWindowAncestor(aView.getComponent()).
-                            getLocation().equals(loc)) {
-                        loc.x += 22;
-                        loc.y += 22;
-                        moved = true;
-                        break;
-                    }
-                }
-            } while (moved);
             f.setLocation(loc);
 
             f.addWindowListener(new WindowAdapter() {
@@ -244,24 +229,49 @@ public class SDIApplication extends AbstractApplication {
                 }
             });
 
-            view.addPropertyChangeListener(new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    String name = evt.getPropertyName();
-                    if (name.equals(View.HAS_UNSAVED_CHANGES_PROPERTY)
-                            || name.equals(View.URI_PROPERTY)
-                            || name.equals(View.TITLE_PROPERTY)
-                            || name.equals(View.MULTIPLE_OPEN_ID_PROPERTY)) {
-                        updateViewTitle(view, f);
-                    }
-                }
-            });
-
             f.setVisible(true);
             view.start();
         }
     }
+
+	private boolean moved(final View view, final JFrame f, Point loc, boolean moved) {
+		do {
+			moved = false;
+			for (Iterator i = views().iterator(); i.hasNext();) {
+				loc(view, loc, i);
+				View aView = (View) i.next();
+				if (aView != view && SwingUtilities.getWindowAncestor(aView.getComponent()) != null
+						&& SwingUtilities.getWindowAncestor(aView.getComponent()).getLocation().equals(loc)) {
+					moved = true;
+					break;
+				}
+			}
+		} while (moved);
+		view.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String name = evt.getPropertyName();
+				if (name.equals(View.HAS_UNSAVED_CHANGES_PROPERTY) || name.equals(View.URI_PROPERTY)
+						|| name.equals(View.TITLE_PROPERTY) || name.equals(View.MULTIPLE_OPEN_ID_PROPERTY)) {
+					updateViewTitle(view, f);
+				}
+			}
+		});
+		return moved;
+	}
+
+	private void loc(final View view, Point loc, Iterator i) {
+		View aView = (View) i.next();
+		if (aView != view && SwingUtilities.getWindowAncestor(aView.getComponent()) != null
+				&& SwingUtilities.getWindowAncestor(aView.getComponent()).getLocation().equals(loc)) {
+			locz(loc);
+		}
+	}
+
+	private void locz(Point loc) {
+		loc.x += 22;
+		loc.y += 22;
+	}
 
     /**
      * Returns the view component. Eventually wraps it into
@@ -318,8 +328,8 @@ public class SDIApplication extends AbstractApplication {
         // Get menus from application model
         JMenu fileMenu = null;
         JMenu editMenu = null;
-        JMenu helpMenu = null;
-        JMenu viewMenu = null;
+        JMenu helpMenu = helpMenu(v);
+		JMenu viewMenu = null;
         JMenu windowMenu = null;
         String fileMenuText = labels.getString("file.text");
         String editMenuText = labels.getString("edit.text");
@@ -344,7 +354,6 @@ public class SDIApplication extends AbstractApplication {
                 windowMenu = mm;
                 continue;
             } else if (text.equals(helpMenuText)) {
-                helpMenu = mm;
                 continue;
             }
             mb.add(mm);
@@ -363,10 +372,6 @@ public class SDIApplication extends AbstractApplication {
         if (windowMenu == null) {
             windowMenu = createWindowMenu(v);
         }
-        if (helpMenu == null) {
-            helpMenu = createHelpMenu(v);
-        }
-
         // Insert standard menus into menu bar
         if (fileMenu != null) {
             mb.add(fileMenu, 0);
@@ -386,6 +391,36 @@ public class SDIApplication extends AbstractApplication {
 
         return mb;
     }
+
+	private JMenu helpMenu(View v) {
+		JMenu helpMenu = null;
+		String fileMenuText = labels.getString("file.text");
+		String editMenuText = labels.getString("edit.text");
+		String viewMenuText = labels.getString("view.text");
+		String windowMenuText = labels.getString("window.text");
+		String helpMenuText = labels.getString("help.text");
+		LinkedList<JMenu> ll = new LinkedList<JMenu>();
+		for (JMenu mm : ll) {
+			String text = mm.getText();
+			if (text == null) {
+			} else if (text.equals(fileMenuText)) {
+				continue;
+			} else if (text.equals(editMenuText)) {
+				continue;
+			} else if (text.equals(viewMenuText)) {
+				continue;
+			} else if (text.equals(windowMenuText)) {
+				continue;
+			} else if (text.equals(helpMenuText)) {
+				helpMenu = mm;
+				continue;
+			}
+		}
+		if (helpMenu == null) {
+			helpMenu = createHelpMenu(v);
+		}
+		return helpMenu;
+	}
 
     @Override
     @Nullable

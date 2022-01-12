@@ -145,27 +145,9 @@ public class CurvedLiner
             if (sp.x == ep.x || sp.y == ep.y) {
                 path.add(new BezierPath.Node(ep.x, ep.y));
             } else {
-                Rectangle2D.Double sb = start.getBounds();
-                sb.x += 5d;
-                sb.y += 5d;
-                sb.width -= 10d;
-                sb.height -= 10d;
-                Rectangle2D.Double eb = end.getBounds();
-                eb.x += 5d;
-                eb.y += 5d;
-                eb.width -= 10d;
-                eb.height -= 10d;
-
-                int soutcode = sb.outcode(sp);
-                if (soutcode == 0) {
-                    soutcode = Geom.outcode(sb, eb);
-                }
-                int eoutcode = eb.outcode(ep);
-                if (eoutcode == 0) {
-                    eoutcode = Geom.outcode(eb, sb);
-                }
-
-                if ((soutcode & (Geom.OUT_TOP | Geom.OUT_BOTTOM)) != 0 &&
+                int eoutcode = eoutcode(start, end, ep);
+				int soutcode = soutcode(start, end, sp);
+				if ((soutcode & (Geom.OUT_TOP | Geom.OUT_BOTTOM)) != 0 &&
                         (eoutcode & (Geom.OUT_TOP | Geom.OUT_BOTTOM)) != 0) {
                     path.add(new BezierPath.Node(BezierPath.C2_MASK, sp.x, sp.y, sp.x, sp.y, sp.x, (sp.y + ep.y) / 2));
                     path.add(new BezierPath.Node(BezierPath.C1_MASK, ep.x, ep.y, ep.x, (sp.y + ep.y) / 2, ep.x, ep.y));
@@ -186,6 +168,42 @@ public class CurvedLiner
 
         path.invalidatePath();
     }
+
+	private int soutcode(Connector start, Connector end, Point2D.Double sp) {
+		Rectangle2D.Double sb = start.getBounds();
+		sb.x += 5d;
+		sb.y += 5d;
+		sb.width -= 10d;
+		sb.height -= 10d;
+		Rectangle2D.Double eb = end.getBounds();
+		eb.x += 5d;
+		eb.y += 5d;
+		eb.width -= 10d;
+		eb.height -= 10d;
+		int soutcode = sb.outcode(sp);
+		if (soutcode == 0) {
+			soutcode = Geom.outcode(sb, eb);
+		}
+		return soutcode;
+	}
+
+	private int eoutcode(Connector start, Connector end, Point2D.Double ep) {
+		Rectangle2D.Double sb = start.getBounds();
+		sb.x += 5d;
+		sb.y += 5d;
+		sb.width -= 10d;
+		sb.height -= 10d;
+		Rectangle2D.Double eb = end.getBounds();
+		eb.x += 5d;
+		eb.y += 5d;
+		eb.width -= 10d;
+		eb.height -= 10d;
+		int eoutcode = eb.outcode(ep);
+		if (eoutcode == 0) {
+			eoutcode = Geom.outcode(eb, sb);
+		}
+		return eoutcode;
+	}
 
     @Override
     public void read(DOMInput in) {

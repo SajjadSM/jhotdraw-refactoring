@@ -161,18 +161,13 @@ public class ComplexColorWheelImageProducer extends AbstractColorWheelImageProdu
         float radius = getRadius();
         Point2D.Float center = getCenter();
 
-        float radial = (components[radialIndex] - colorSpace.getMinValue(radialIndex))//
-                / (colorSpace.getMaxValue(radialIndex) - colorSpace.getMinValue(radialIndex)) * 2 - 1;
-        float angular = (components[angularIndex] - colorSpace.getMinValue(angularIndex))//
+        float radial = radial(components);
+		float angular = (components[angularIndex] - colorSpace.getMinValue(angularIndex))//
                 / (colorSpace.getMaxValue(angularIndex) - colorSpace.getMinValue(angularIndex)) * 2 - 1;
-        if (flipX) {
-            radial = -radial;
-        }
         if (flipY) {
             angular = -angular;
         }
 
-        radial = max(-1, min(radial, 1));
         angular = max(-1, min(angular, 1));
 
 
@@ -200,6 +195,16 @@ public class ComplexColorWheelImageProducer extends AbstractColorWheelImageProdu
                 );
         return p;
     }
+
+	private float radial(float[] components) {
+		float radial = (components[radialIndex] - colorSpace.getMinValue(radialIndex))
+				/ (colorSpace.getMaxValue(radialIndex) - colorSpace.getMinValue(radialIndex)) * 2 - 1;
+		if (flipX) {
+			radial = -radial;
+		}
+		radial = max(-1, min(radial, 1));
+		return radial;
+	}
 
     @Override
     public float[] getColorAt(int x, int y) {
