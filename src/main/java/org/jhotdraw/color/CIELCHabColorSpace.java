@@ -53,40 +53,11 @@ public class CIELCHabColorSpace extends AbstractNamedColorSpace {
 
     @Override
     public float[] toRGB(float[] colorvalue, float[] rgb) {
-        float[] ciexyz =rgb;//reuse array
+        double Bs = Bs(rgb);
+		double Gs = Gs(rgb);
+		double Rs = Rs(rgb);
+		float[] ciexyz =rgb;//reuse array
         toCIEXYZ(colorvalue,ciexyz);
-
-        // Convert to sRGB as described in
-        // http://www.w3.org/Graphics/Color/sRGB.html
-        double X = ciexyz[0];
-        double Y = ciexyz[1];
-        double Z = ciexyz[2];
-
-        double Rs = 3.2410 * X + -1.5374 * Y + -0.4986 * Z;
-        double Gs = -0.9692 * X + 1.8760 * Y + -0.0416 * Z;
-        double Bs = 0.0556 * X + -0.2040 * Y + 1.0570 * Z;
-
-        if (Rs <= 0.00304) {
-            Rs = 12.92 * Rs;
-        } else {
-            Rs = 1.055 * Math.pow(Rs, 1d / 2.4) - 0.055;
-        }
-        if (Gs <= 0.00304) {
-            Gs = 12.92 * Gs;
-        } else {
-            Gs = 1.055 * Math.pow(Gs, 1d / 2.4) - 0.055;
-        }
-        if (Bs <= 0.00304) {
-            Bs = 12.92 * Bs;
-        } else {
-            Bs = 1.055 * Math.pow(Bs, 1d / 2.4) - 0.055;
-        }
-
-        if (isClampRGB) {
-            Rs = Math.min(1, Math.max(0, Rs));
-            Gs = Math.min(1, Math.max(0, Gs));
-            Bs = Math.min(1, Math.max(0, Bs));
-        }
 
         rgb[0]=(float)Rs;
         rgb[1]=(float)Gs;
@@ -94,6 +65,57 @@ public class CIELCHabColorSpace extends AbstractNamedColorSpace {
         return rgb;
         //       return sRGB.fromCIEXYZ(ciexyz);
     }
+
+	private double Rs(float[] rgb) {
+		float[] ciexyz = rgb;
+		double X = ciexyz[0];
+		double Y = ciexyz[1];
+		double Z = ciexyz[2];
+		double Rs = 3.2410 * X + -1.5374 * Y + -0.4986 * Z;
+		if (Rs <= 0.00304) {
+			Rs = 12.92 * Rs;
+		} else {
+			Rs = 1.055 * Math.pow(Rs, 1d / 2.4) - 0.055;
+		}
+		if (isClampRGB) {
+			Rs = Math.min(1, Math.max(0, Rs));
+		}
+		return Rs;
+	}
+
+	private double Gs(float[] rgb) {
+		float[] ciexyz = rgb;
+		double X = ciexyz[0];
+		double Y = ciexyz[1];
+		double Z = ciexyz[2];
+		double Gs = -0.9692 * X + 1.8760 * Y + -0.0416 * Z;
+		if (Gs <= 0.00304) {
+			Gs = 12.92 * Gs;
+		} else {
+			Gs = 1.055 * Math.pow(Gs, 1d / 2.4) - 0.055;
+		}
+		if (isClampRGB) {
+			Gs = Math.min(1, Math.max(0, Gs));
+		}
+		return Gs;
+	}
+
+	private double Bs(float[] rgb) {
+		float[] ciexyz = rgb;
+		double X = ciexyz[0];
+		double Y = ciexyz[1];
+		double Z = ciexyz[2];
+		double Bs = 0.0556 * X + -0.2040 * Y + 1.0570 * Z;
+		if (Bs <= 0.00304) {
+			Bs = 12.92 * Bs;
+		} else {
+			Bs = 1.055 * Math.pow(Bs, 1d / 2.4) - 0.055;
+		}
+		if (isClampRGB) {
+			Bs = Math.min(1, Math.max(0, Bs));
+		}
+		return Bs;
+	}
 
     @Override
     public float[] fromRGB(float[] rgb, float[] colorvalue) {
