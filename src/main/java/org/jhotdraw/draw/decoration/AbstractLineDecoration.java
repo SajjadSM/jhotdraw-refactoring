@@ -95,41 +95,50 @@ public abstract class AbstractLineDecoration implements LineDecoration {
         Rectangle2D.Double area = new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight());
         
         if (isStroked) {
-            double strokeWidth = f.get(STROKE_WIDTH);
-            int strokeJoin = f.get(STROKE_JOIN);
-            double miterLimit = (f.get(STROKE_MITER_LIMIT) * strokeWidth);
-            
-            double grow;
-            if (strokeJoin == BasicStroke.JOIN_MITER) {
-                grow  = (int) (1 + strokeWidth / 2 * miterLimit);
-            } else {
-                grow  = (int) (1 + strokeWidth / 2);
-            }
-            Geom.grow(area, grow, grow);
+            double grow = grow(f);
+			Geom.grow(area, grow, grow);
         } else {
             Geom.grow(area, 1, 1); // grow due to antialiasing
         }
         
         return area;
     }
+
+	private double grow(Figure f) {
+		double strokeWidth = f.get(STROKE_WIDTH);
+		int strokeJoin = f.get(STROKE_JOIN);
+		double miterLimit = (f.get(STROKE_MITER_LIMIT) * strokeWidth);
+		double grow;
+		if (strokeJoin == BasicStroke.JOIN_MITER) {
+			grow = (int) (1 + strokeWidth / 2 * miterLimit);
+		} else {
+			grow = (int) (1 + strokeWidth / 2);
+		}
+		return grow;
+	}
     
     @Override
     public double getDecorationRadius(Figure f) {
-        double strokeWidth = f.get(STROKE_WIDTH);
-        double scaleFactor;
-        if (strokeWidth > 1f) {
-            scaleFactor = 1d + (strokeWidth - 1d) / 2d;
-        } else {
-            scaleFactor = 1d;
-        }
-        return getDecoratorPathRadius(f) * scaleFactor;
+        double scaleFactor = scaleFactor(f);
+		return getDecoratorPathRadius(f) * scaleFactor;
     }
+
+	private double scaleFactor(Figure f) {
+		double strokeWidth = f.get(STROKE_WIDTH);
+		double scaleFactor;
+		if (strokeWidth > 1f) {
+			scaleFactor = 1d + (strokeWidth - 1d) / 2d;
+		} else {
+			scaleFactor = 1d;
+		}
+		return scaleFactor;
+	}
     
     private Path2D.Double getTransformedDecoratorPath(Figure f, Point2D.Double p1, Point2D.Double p2) {
         Path2D.Double path = getDecoratorPath(f);
-        double strokeWidth = f.get(STROKE_WIDTH);
+        AffineTransform transform = transform(f, p1, p2);
+		double strokeWidth = f.get(STROKE_WIDTH);
         
-        AffineTransform transform = new AffineTransform();
         transform.translate(p1.x, p1.y);
         transform.rotate(Math.atan2(p1.x - p2.x, p2.y - p1.y));
        // transform.rotate(Math.PI / 2);
@@ -140,6 +149,17 @@ public abstract class AbstractLineDecoration implements LineDecoration {
         
         return path;
     }
+
+	private AffineTransform transform(Figure f, Point2D.Double p1, Point2D.Double p2) {
+		double strokeWidth = f.get(STROKE_WIDTH);
+		AffineTransform transform = new AffineTransform();
+		transform.translate(p1.x, p1.y);
+		transform.rotate(Math.atan2(p1.x - p2.x, p2.y - p1.y));
+		if (strokeWidth > 1f) {
+			transform.scale(1d + (strokeWidth - 1d) / 2d, 1d + (strokeWidth - 1d) / 2d);
+		}
+		return transform;
+	}
     
     protected void setFilled(boolean b) {
         isFilled = b;

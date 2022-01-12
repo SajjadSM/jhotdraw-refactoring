@@ -48,17 +48,25 @@ public class TransformRestoreEdit extends AbstractUndoableEdit {
     @Override
     public void undo() throws CannotUndoException {
         super.undo();
-        owner.willChange();
-        owner.restoreTransformTo(oldTransformRestoreData);
-        owner.changed();
+        undoOwner();
     }
+
+	private void undoOwner() {
+		owner.willChange();
+		owner.restoreTransformTo(oldTransformRestoreData);
+		owner.changed();
+	}
 
     @Override
     public void redo() throws CannotRedoException {
         super.redo();
-        owner.willChange();
-        owner.restoreTransformTo(newTransformRestoreData);
-        owner.changed();
+        owner();
     }
+
+	private void owner() {
+		owner.willChange();
+		owner.restoreTransformTo(newTransformRestoreData);
+		owner.changed();
+	}
     
 }

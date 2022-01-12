@@ -115,16 +115,8 @@ public class BezierScaleHandle extends AbstractHandle {
     @Override
     public void trackStep(Point anchor, Point lead, int modifiersEx) {
         location = new Point(lead.x, lead.y);
-        Point2D.Double leadPoint = view.viewToDrawing(lead);
-        double stepTheta = Geom.angle(center.x, center.y, leadPoint.x, leadPoint.y);
-        double stepLength = Geom.length(center.x, center.y, leadPoint.x, leadPoint.y);
-        double scaleFactor = (modifiersEx & (InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)) != 0 ? 1d : stepLength / startLength;
-        transform.setToIdentity();
-        transform.translate(center.x, center.y);
-        transform.scale(scaleFactor, scaleFactor);
-        transform.rotate(stepTheta - startTheta);
-        transform.translate(-center.x, -center.y);
-        getOwner().willChange();
+        transform(lead, modifiersEx);
+		getOwner().willChange();
         getOwner().restoreTransformTo(restoreData);
         getOwner().transform(transform);
         getOwner().changed();
@@ -162,6 +154,19 @@ public class BezierScaleHandle extends AbstractHandle {
                 changed();
         }
      */
+
+	private void transform(Point lead, int modifiersEx) {
+		Point2D.Double leadPoint = view.viewToDrawing(lead);
+		double stepTheta = Geom.angle(center.x, center.y, leadPoint.x, leadPoint.y);
+		double stepLength = Geom.length(center.x, center.y, leadPoint.x, leadPoint.y);
+		double scaleFactor = (modifiersEx & (InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)) != 0 ? 1d
+				: stepLength / startLength;
+		transform.setToIdentity();
+		transform.translate(center.x, center.y);
+		transform.scale(scaleFactor, scaleFactor);
+		transform.rotate(stepTheta - startTheta);
+		transform.translate(-center.x, -center.y);
+	}
     
     @Override
     public void trackEnd(Point anchor, Point lead, int modifiersEx) {

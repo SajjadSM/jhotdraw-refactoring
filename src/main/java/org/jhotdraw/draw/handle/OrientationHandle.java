@@ -91,9 +91,13 @@ public class OrientationHandle extends AbstractHandle {
     public void trackStart(Point anchor, int modifiersEx) {
         oldValue = getOwner().get(ORIENTATION);
         
-        centerBox = view.drawingToView(getOwner().getBounds());
-        centerBox.grow(centerBox.width / -3, centerBox.height / -3);
+        centerBox();
     }
+
+	private void centerBox() {
+		centerBox = view.drawingToView(getOwner().getBounds());
+		centerBox.grow(centerBox.width / -3, centerBox.height / -3);
+	}
     
     @Override
     public void trackStep(Point anchor, Point lead, int modifiersEx) {

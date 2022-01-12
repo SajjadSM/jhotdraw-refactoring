@@ -114,15 +114,20 @@ public class ConnectorHandle extends AbstractHandle {
             connectableFigure = figure;
             repaintConnectors();
         }
-        connectableConnector = findConnectableConnector(figure, p);
-        if (connectableConnector != null) {
-            p = connectableConnector.getAnchor();
-        }
-        getConnection().willChange();
+        p = p(p, figure);
+		getConnection().willChange();
         getConnection().setEndPoint(p);
         getConnection().changed();
         fireAreaInvalidated(getDrawingArea());
     }
+
+	private Point2D.Double p(Point2D.Double p, Figure figure) {
+		connectableConnector = findConnectableConnector(figure, p);
+		if (connectableConnector != null) {
+			p = connectableConnector.getAnchor();
+		}
+		return p;
+	}
 
     @Override
     public Rectangle getDrawingArea() {
@@ -143,35 +148,10 @@ public class ConnectorHandle extends AbstractHandle {
         Figure f = findConnectableFigure(p, view.getDrawing());
         connectableConnector = findConnectableConnector(f, p);
         if (connectableConnector != null) {
-            final Drawing drawing = view.getDrawing();
-            final ConnectionFigure c = getConnection();
-            getConnection().setStartConnector(connector);
+            view();
+			getConnection().setStartConnector(connector);
             getConnection().setEndConnector(connectableConnector);
             getConnection().updateConnection();
-            view.clearSelection();
-            view.addToSelection(c);
-            view.getDrawing().fireUndoableEditHappened(new AbstractUndoableEdit() {
-
-                @Override
-                public String getPresentationName() {
-                    ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-                    return labels.getString("edit.createConnectionFigure.text");
-                }
-
-                @Override
-                public void undo() throws CannotUndoException {
-                    super.undo();
-                    drawing.remove(c);
-                }
-
-                @Override
-                public void redo() throws CannotRedoException {
-                    super.redo();
-                    drawing.add(c);
-                    view.clearSelection();
-                    view.addToSelection(c);
-                }
-            });
         } else {
             view.getDrawing().remove(getConnection());
             fireAreaInvalidated(getDrawingArea());
@@ -181,6 +161,35 @@ public class ConnectorHandle extends AbstractHandle {
         setConnection(null);
         setTargetFigure(null);
     }
+
+	private void view() throws java.util.MissingResourceException, javax.swing.undo.CannotUndoException,
+			javax.swing.undo.CannotRedoException {
+		final Drawing drawing = view.getDrawing();
+		final ConnectionFigure c = getConnection();
+		view.clearSelection();
+		view.addToSelection(c);
+		view.getDrawing().fireUndoableEditHappened(new AbstractUndoableEdit() {
+			@Override
+			public String getPresentationName() {
+				ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+				return labels.getString("edit.createConnectionFigure.text");
+			}
+
+			@Override
+			public void undo() throws CannotUndoException {
+				super.undo();
+				drawing.remove(c);
+			}
+
+			@Override
+			public void redo() throws CannotRedoException {
+				super.redo();
+				drawing.add(c);
+				view.clearSelection();
+				view.addToSelection(c);
+			}
+		});
+	}
 
     /**
      * Creates the ConnectionFigure. By default the figure prototype is
