@@ -77,7 +77,8 @@ public class ImageTool extends CreationTool {
     @Override
     public void activate(DrawingEditor editor) {
         super.activate(editor);
-        final DrawingView v=getView();
+        File file = file();
+		final DrawingView v=getView();
         if (v==null)return;
 
         if (workerThread != null) {
@@ -85,22 +86,6 @@ public class ImageTool extends CreationTool {
                 workerThread.join();
             } catch (InterruptedException ex) {
                 // ignore
-            }
-        }
-
-        final File file;
-        if (useFileDialog) {
-            getFileDialog().setVisible(true);
-            if (getFileDialog().getFile() != null) {
-                file = new File(getFileDialog().getDirectory(), getFileDialog().getFile());
-            } else {
-                file = null;
-            }
-        } else {
-            if (getFileChooser().showOpenDialog(v.getComponent()) == JFileChooser.APPROVE_OPTION) {
-                file = getFileChooser().getSelectedFile();
-            } else {
-                file = null;
             }
         }
 
@@ -150,6 +135,26 @@ public class ImageTool extends CreationTool {
             }
         }
     }
+
+	private File file() throws java.awt.HeadlessException {
+		final DrawingView v = getView();
+		final File file;
+		if (useFileDialog) {
+			getFileDialog().setVisible(true);
+			if (getFileDialog().getFile() != null) {
+				file = new File(getFileDialog().getDirectory(), getFileDialog().getFile());
+			} else {
+				file = null;
+			}
+		} else {
+			if (getFileChooser().showOpenDialog(v.getComponent()) == JFileChooser.APPROVE_OPTION) {
+				file = getFileChooser().getSelectedFile();
+			} else {
+				file = null;
+			}
+		}
+		return file;
+	}
 
     private JFileChooser getFileChooser() {
         if (fileChooser == null) {

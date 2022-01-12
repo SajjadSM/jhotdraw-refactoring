@@ -193,25 +193,31 @@ public class CreationTool extends AbstractTool {
     public void mousePressed(MouseEvent evt) {
         super.mousePressed(evt);
         getView().clearSelection();
-        createdFigure = createFigure();
-        Point2D.Double p = constrainPoint(viewToDrawing(anchor));
-        anchor.x = evt.getX();
-        anchor.y = evt.getY();
-        createdFigure.setBounds(p, p);
-        getDrawing().add(createdFigure);
+        createdFigure(evt);
+		getDrawing().add(createdFigure);
     }
+
+	private void createdFigure(MouseEvent evt) {
+		createdFigure = createFigure();
+		Point2D.Double p = constrainPoint(viewToDrawing(anchor));
+		anchor.x = evt.getX();
+		anchor.y = evt.getY();
+		createdFigure.setBounds(p, p);
+	}
 
     @Override
     public void mouseDragged(MouseEvent evt) {
         if (createdFigure != null) {
-            Point2D.Double p = constrainPoint(new Point(evt.getX(), evt.getY()));
-            createdFigure.willChange();
-            createdFigure.setBounds(
-                    constrainPoint(new Point(anchor.x, anchor.y)),
-                    p);
-            createdFigure.changed();
+            createdFigure2(evt);
         }
     }
+
+	private void createdFigure2(MouseEvent evt) {
+		Point2D.Double p = constrainPoint(new Point(evt.getX(), evt.getY()));
+		createdFigure.willChange();
+		createdFigure.setBounds(constrainPoint(new Point(anchor.x, anchor.y)), p);
+		createdFigure.changed();
+	}
 
     @Override
     public void mouseReleased(MouseEvent evt) {

@@ -123,11 +123,15 @@ public class FloatingTextArea {
      */
     public void setBounds(Rectangle2D.Double r, String text) {
         textArea.setText(text);
-        editScrollContainer.setBounds(view.drawingToView(r));
-        editScrollContainer.setVisible(true);
-        textArea.setCaretPosition(0);
+        editScrollContainer(r);
+		textArea.setCaretPosition(0);
         textArea.requestFocus();
     }
+
+	private void editScrollContainer(Rectangle2D.Double r) {
+		editScrollContainer.setBounds(view.drawingToView(r));
+		editScrollContainer.setVisible(true);
+	}
 
     /**
      * Gets the text contents of the overlay.
@@ -151,8 +155,8 @@ public class FloatingTextArea {
      */
     public void endOverlay() {
         view.getComponent().requestFocus();
-        if (editScrollContainer != null) {
-            editScrollContainer.setVisible(false);
+        editScrollContainer2();
+		if (editScrollContainer != null) {
             view.getComponent().remove(editScrollContainer);
 
             Rectangle bounds = editScrollContainer.getBounds();
@@ -163,4 +167,10 @@ public class FloatingTextArea {
             editedFigure = null;
         }
     }
+
+	private void editScrollContainer2() {
+		if (editScrollContainer != null) {
+			editScrollContainer.setVisible(false);
+		}
+	}
 }

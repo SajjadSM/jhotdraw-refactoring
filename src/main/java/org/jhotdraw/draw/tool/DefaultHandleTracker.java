@@ -131,15 +131,22 @@ public class DefaultHandleTracker extends AbstractTool implements HandleTracker 
     @Override
     public void deactivate(DrawingEditor editor) {
         super.deactivate(editor);
-        DrawingView v = getView();
-        if (v != null) {
+        DrawingView v = v();
+		if (v != null) {
             v.setCursor(Cursor.getDefaultCursor());
-            v.setActiveHandle(null);
         }
         clearHoverHandles();
         dragLocation = null;
         masterHandle.removeHandleListener(eventHandler);
     }
+
+	private DrawingView v() {
+		DrawingView v = getView();
+		if (v != null) {
+			v.setActiveHandle(null);
+		}
+		return v;
+	}
 
     @Override
     public void keyPressed(KeyEvent evt) {
@@ -207,28 +214,28 @@ public class DefaultHandleTracker extends AbstractTool implements HandleTracker 
         if (view == null || editor.getActiveView() != view) {
             clearHoverHandles();
         } else {
-            // Search first, if one of the selected figures contains
-            // the current mouse location. Only then search for other
-            // figures. This search sequence is consistent with the
-            // search sequence of the SelectionTool.
-            Figure figure = null;
-            Point2D.Double p = view.viewToDrawing(point);
-            for (Figure f : view.getSelectedFigures()) {
-                if (f.contains(p)) {
-                    figure = f;
-                }
-            }
-            if (figure == null) {
-                figure = view.findFigure(point);
-                Drawing drawing = view.getDrawing();
-                while (figure != null && !figure.isSelectable()) {
-                    figure = drawing.findFigureBehind(p, figure);
-                }
-            }
-
-            updateHoverHandles(view, figure);
+            Figure figure = figure(point, view);
+			updateHoverHandles(view, figure);
         }
     }
+
+	private Figure figure(Point point, DrawingView view) {
+		Figure figure = null;
+		Point2D.Double p = view.viewToDrawing(point);
+		for (Figure f : view.getSelectedFigures()) {
+			if (f.contains(p)) {
+				figure = f;
+			}
+		}
+		if (figure == null) {
+			figure = view.findFigure(point);
+			Drawing drawing = view.getDrawing();
+			while (figure != null && !figure.isSelectable()) {
+				figure = drawing.findFigureBehind(p, figure);
+			}
+		}
+		return figure;
+	}
 
     @Override
     public void mousePressed(MouseEvent evt) {

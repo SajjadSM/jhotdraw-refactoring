@@ -144,16 +144,8 @@ public class TextInputFormat implements InputFormat {
         BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF8"));
 
         if (isMultiline) {
-            TextHolderFigure figure = (TextHolderFigure) prototype.clone();
-            StringBuilder buf = new StringBuilder();
-            for (String line = null; line != null; line = r.readLine()) {
-                if (buf.length() != 0) {
-                    buf.append('\n');
-                }
-                buf.append(line);
-            }
-            figure.setText(buf.toString());
-            Dimension2DDouble s = figure.getPreferredSize();
+            TextHolderFigure figure = figure(r);
+			Dimension2DDouble s = figure.getPreferredSize();
             figure.setBounds(
                     new Point2D.Double(0, 0),
                     new Point2D.Double(
@@ -177,6 +169,19 @@ public class TextInputFormat implements InputFormat {
         }
         return list;
     }
+
+	private TextHolderFigure figure(BufferedReader r) throws java.io.IOException {
+		TextHolderFigure figure = (TextHolderFigure) prototype.clone();
+		StringBuilder buf = new StringBuilder();
+		for (String line = null; line != null; line = r.readLine()) {
+			if (buf.length() != 0) {
+				buf.append('\n');
+			}
+			buf.append(line);
+		}
+		figure.setText(buf.toString());
+		return figure;
+	}
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
@@ -202,10 +207,9 @@ public class TextInputFormat implements InputFormat {
         } else {
             double y = 0;
             for (String line : text.split("\n")) {
-                TextHolderFigure figure = (TextHolderFigure) prototype.clone();
-                figure.setText(line);
+                y = y(y, line);
+				TextHolderFigure figure = (TextHolderFigure) prototype.clone();
                 Dimension2DDouble s = figure.getPreferredSize();
-                y += s.height;
                 figure.willChange();
                 figure.setBounds(
                         new Point2D.Double(0, 0 + y),
@@ -220,4 +224,12 @@ public class TextInputFormat implements InputFormat {
         }
         drawing.addAll(list);
     }
+
+	private double y(double y, String line) {
+		TextHolderFigure figure = (TextHolderFigure) prototype.clone();
+		figure.setText(line);
+		Dimension2DDouble s = figure.getPreferredSize();
+		y += s.height;
+		return y;
+	}
 }

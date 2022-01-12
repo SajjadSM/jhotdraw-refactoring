@@ -101,15 +101,8 @@ public class BezierLabelLocator implements Locator, DOMStorable {
         if (point == null) {
             return new Point2D.Double(0,0);
         }
-        Point2D.Double nextPoint = owner.getPointOnPath(
-                (relativePosition < 0.5) ? (float) relativePosition + 0.1f : (float) relativePosition - 0.1f,
-                3);
-        
-        double dir = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x);
-        if (relativePosition >= 0.5) {
-            dir += Math.PI;
-        }
-        double alpha = dir + angle;
+        double dir = dir(owner, point);
+		double alpha = dir + angle;
         
         Point2D.Double p = new Point2D.Double(
                 point.x + distance * Math.cos(alpha),
@@ -219,6 +212,15 @@ public class BezierLabelLocator implements Locator, DOMStorable {
             }
         }*/
     }
+	private double dir(BezierFigure owner, Point2D.Double point) {
+		Point2D.Double nextPoint = owner.getPointOnPath(
+				(relativePosition < 0.5) ? (float) relativePosition + 0.1f : (float) relativePosition - 0.1f, 3);
+		double dir = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x);
+		if (relativePosition >= 0.5) {
+			dir += Math.PI;
+		}
+		return dir;
+	}
     
     @Override
     public void read(DOMInput in) {

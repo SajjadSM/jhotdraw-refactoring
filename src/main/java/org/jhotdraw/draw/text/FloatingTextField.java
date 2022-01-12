@@ -72,14 +72,18 @@ public  class FloatingTextField {
     public void createOverlay(DrawingView view, TextHolderFigure figure) {
         view.getComponent().add(textField, 0);
         textField.setText(figure.getText());
-        textField.setColumns(figure.getTextColumns());
-        textField.selectAll();
-        textField.setVisible(true);
-        editedFigure = figure;
+        editedFigure(view, figure);
+		textField.selectAll();
         editedFigure.addFigureListener(figureHandler);
-        this.view = view;
-        updateWidget();
     }
+
+	private void editedFigure(DrawingView view, TextHolderFigure figure) {
+		textField.setColumns(figure.getTextColumns());
+		textField.setVisible(true);
+		editedFigure = figure;
+		this.view = view;
+		updateWidget();
+	}
     
     protected void updateWidget() {
         Font font = editedFigure.getFont();
@@ -148,8 +152,8 @@ public  class FloatingTextField {
      */
     public void endOverlay() {
         view.getComponent().requestFocus();
-        if (textField != null) {
-            textField.setVisible(false);
+        textField();
+		if (textField != null) {
             view.getComponent().remove(textField);
             
             Rectangle bounds = textField.getBounds();
@@ -160,5 +164,11 @@ public  class FloatingTextField {
             editedFigure = null;
         }
     }
+
+	private void textField() {
+		if (textField != null) {
+			textField.setVisible(false);
+		}
+	}
 }
 

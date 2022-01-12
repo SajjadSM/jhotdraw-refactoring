@@ -81,51 +81,48 @@ public class DrawingPageable implements Pageable {
         }
         if (drawing.getChildCount() > 0) {
 
-            Graphics2D g = (Graphics2D) graphics;
+            AffineTransform tx = tx(graphics, pageFormat);
+			Graphics2D g = (Graphics2D) graphics;
             setRenderingHints(g);
 
-            // Determine the draw bounds of the drawing
-            Rectangle2D.Double drawBounds = null;
-            for (Figure f : drawing.getChildren()) {
-                if (drawBounds == null) {
-                    drawBounds = f.getDrawingArea();
-                } else {
-                    drawBounds.add(f.getDrawingArea());
-                }
-            }
-
-            // Setup a transformation for the drawing
-            AffineTransform tx = new AffineTransform();
-            tx.translate(
-                    pageFormat.getImageableX(),
-                    pageFormat.getImageableY());
-
-            // Maybe rotate drawing
-            if (isAutorotate
-                    && drawBounds.width > drawBounds.height
-                    && pageFormat.getImageableWidth() < pageFormat.getImageableHeight()) {
-
-                double scaleFactor = Math.min(
-                        pageFormat.getImageableWidth() / drawBounds.height,
-                        pageFormat.getImageableHeight() / drawBounds.width);
-                tx.scale(scaleFactor, scaleFactor);
-                tx.translate(drawBounds.height, 0d);
-                tx.rotate(Math.PI / 2d, 0, 0);
-                tx.translate(-drawBounds.x, -drawBounds.y);
-            } else {
-                double scaleFactor = Math.min(
-                        pageFormat.getImageableWidth() / drawBounds.width,
-                        pageFormat.getImageableHeight() / drawBounds.height);
-                tx.scale(scaleFactor, scaleFactor);
-                tx.translate(-drawBounds.x, -drawBounds.y);
-            }
             g.transform(tx);
-
-            // Draw the drawing
-            drawing.draw(g);
         }
         return Printable.PAGE_EXISTS;
     }
+
+	private AffineTransform tx(Graphics graphics, PageFormat pageFormat) {
+		drawing(graphics);
+		Rectangle2D.Double drawBounds = null;
+		for (Figure f : drawing.getChildren()) {
+			if (drawBounds == null) {
+				drawBounds = f.getDrawingArea();
+			} else {
+				drawBounds.add(f.getDrawingArea());
+			}
+		}
+		AffineTransform tx = new AffineTransform();
+		tx.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+		if (isAutorotate && drawBounds.width > drawBounds.height
+				&& pageFormat.getImageableWidth() < pageFormat.getImageableHeight()) {
+			double scaleFactor = Math.min(pageFormat.getImageableWidth() / drawBounds.height,
+					pageFormat.getImageableHeight() / drawBounds.width);
+			tx.scale(scaleFactor, scaleFactor);
+			tx.translate(drawBounds.height, 0d);
+			tx.rotate(Math.PI / 2d, 0, 0);
+			tx.translate(-drawBounds.x, -drawBounds.y);
+		} else {
+			double scaleFactor = Math.min(pageFormat.getImageableWidth() / drawBounds.width,
+					pageFormat.getImageableHeight() / drawBounds.height);
+			tx.scale(scaleFactor, scaleFactor);
+			tx.translate(-drawBounds.x, -drawBounds.y);
+		}
+		return tx;
+	}
+
+	private void drawing(Graphics graphics) {
+		Graphics2D g = (Graphics2D) graphics;
+		drawing.draw(g);
+	}
 
     protected void setRenderingHints(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
