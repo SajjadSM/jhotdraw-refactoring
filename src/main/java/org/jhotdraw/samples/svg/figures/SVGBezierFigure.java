@@ -178,16 +178,8 @@ public class SVGBezierFigure extends BezierFigure {
      */
     @Override
     public boolean joinSegments(Point2D.Double join, double tolerance) {
-        // Apply inverse of transform to point
-        if (get(TRANSFORM) != null) {
-            try {
-                join = (Point2D.Double) get(TRANSFORM).inverseTransform(join, new Point2D.Double());
-            } catch (NoninvertibleTransformException ex) {
-                System.err.println("Warning: SVGBezierFigure.findSegment. Figure has noninvertible Transform.");
-            }
-        }
-
-        int i = getBezierPath().findSegment(join, tolerance);
+        join = join2(join);
+		int i = getBezierPath().findSegment(join, tolerance);
 
         if (i != -1 && i > 1) {
             removeNode(i);
@@ -195,6 +187,22 @@ public class SVGBezierFigure extends BezierFigure {
         }
         return false;
     }
+
+	private Point2D.Double join2(Point2D.Double join) {
+		if (get(TRANSFORM) != null) {
+			try {
+				join = (Point2D.Double) get(TRANSFORM).inverseTransform(join, new Point2D.Double());
+			} catch (NoninvertibleTransformException ex) {
+				System.err.println("Warning: SVGBezierFigure.findSegment. Figure has noninvertible Transform.");
+			}
+			try {
+				join = (Point2D.Double) get(TRANSFORM).inverseTransform(join, new Point2D.Double());
+			} catch (NoninvertibleTransformException ex) {
+				System.err.println("Warning: SVGBezierFigure.findSegment. Figure has noninvertible Transform.");
+			}
+		}
+		return join;
+	}
 
     /**
      * Splits the segment at the given Point2D.Double if a segment was hit.

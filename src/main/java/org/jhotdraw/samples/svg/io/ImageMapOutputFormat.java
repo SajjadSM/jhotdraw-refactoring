@@ -190,14 +190,8 @@ public class ImageMapOutputFormat implements OutputFormat {
         } else if (f instanceof SVGPathFigure) {
             SVGPathFigure path = (SVGPathFigure) f;
             if (path.getChildCount() == 1) {
-                BezierFigure bezier = (BezierFigure) path.getChild(0);
-                boolean isLinear = true;
-                for (int i = 0, n = bezier.getNodeCount(); i < n; i++) {
-                    if (bezier.getNode(i).getMask() != 0) {
-                        isLinear = false;
-                        break;
-                    }
-                }
+                boolean isLinear = isLinear(path);
+				BezierFigure bezier = (BezierFigure) path.getChild(0);
                 if (isLinear) {
                     if (bezier.isClosed()) {
                         writePolygonElement(parent, path);
@@ -224,6 +218,18 @@ public class ImageMapOutputFormat implements OutputFormat {
             System.out.println("Unable to write: " + f);
         }
     }
+
+	private boolean isLinear(SVGPathFigure path) {
+		BezierFigure bezier = (BezierFigure) path.getChild(0);
+		boolean isLinear = true;
+		for (int i = 0, n = bezier.getNodeCount(); i < n; i++) {
+			if (bezier.getNode(i).getMask() != 0) {
+				isLinear = false;
+				break;
+			}
+		}
+		return isLinear;
+	}
 
     /**
      * Writes the <code>shape</code>, <code>coords</code>, <code>href</code>,

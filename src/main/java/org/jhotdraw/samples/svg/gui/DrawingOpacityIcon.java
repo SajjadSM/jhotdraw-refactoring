@@ -76,18 +76,16 @@ public class DrawingOpacityIcon extends javax.swing.ImageIcon {
     public void paintIcon(java.awt.Component c, java.awt.Graphics gr, int x, int y) {
         Graphics2D g = (Graphics2D) gr;
         super.paintIcon(c, g, x, y);
-        Double opacity=0d;
-        Color fillColor=null;
+        Double opacity = opacity();
+		Color fillColor=null;
         Color strokeColor=null;
         if (editor != null) {
             DrawingView view = editor.getActiveView();
             if (view != null && view.getDrawing() != null) {
                 Drawing d = view.getDrawing();
-                opacity = d.get(opacityKey);
                 fillColor = (fillColorKey == null) ? null : d.get(fillColorKey);
                 strokeColor = (strokeColorKey == null) ? null : d.get(strokeColorKey);
             } else {
-                opacity = opacityKey.get(editor.getDefaultAttributes());
                 fillColor = (fillColorKey == null) ? null : fillColorKey.get(editor.getDefaultAttributes());
                 strokeColor = (strokeColorKey == null) ? null : strokeColorKey.get(editor.getDefaultAttributes());
             }
@@ -116,4 +114,18 @@ public class DrawingOpacityIcon extends javax.swing.ImageIcon {
             }
         }
     }
+
+	private Double opacity() {
+		Double opacity = 0d;
+		if (editor != null) {
+			DrawingView view = editor.getActiveView();
+			if (view != null && view.getDrawing() != null) {
+				Drawing d = view.getDrawing();
+				opacity = d.get(opacityKey);
+			} else {
+				opacity = opacityKey.get(editor.getDefaultAttributes());
+			}
+		}
+		return opacity;
+	}
 }

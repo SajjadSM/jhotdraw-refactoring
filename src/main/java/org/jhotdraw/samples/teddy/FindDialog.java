@@ -263,46 +263,56 @@ public class FindDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_ignoreCasePerformed
     
     private void replace(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replace
-        TeddyView view = ((TeddyView) app.getActiveView());
-        if (view != null) {
-            CompositeEdit edit = new CompositeEdit("Replace");
-            view.fireEdit(edit);
+        TeddyView view = view();
+		if (view != null) {
             view.replaceRange(
                     
                     replaceField.getText(),
                     view.getSelectionStart(),
                     view.getSelectionEnd()
                     );
-            view.fireEdit(edit);
         }
     }//GEN-LAST:event_replace
+
+	private TeddyView view() {
+		TeddyView view = ((TeddyView) app.getActiveView());
+		if (view != null) {
+			CompositeEdit edit = new CompositeEdit("Replace");
+			view.fireEdit(edit);
+			view.fireEdit(edit);
+		}
+		return view;
+	}
     
     private void replaceAndFind(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceAndFind
-        TeddyView view = ((TeddyView) app.getActiveView());
-        if (view != null) {
-            CompositeEdit edit = new CompositeEdit("Replace And Find");
-            view.fireEdit(edit);
+        TeddyView view = view2();
+		if (view != null) {
             view.replaceRange(
                     replaceField.getText(),
                     view.getSelectionStart(),
                     view.getSelectionEnd()
                     );
             next(evt);
-            view.fireEdit(edit);
         }
     }//GEN-LAST:event_replaceAndFind
+
+	private TeddyView view2() {
+		TeddyView view = ((TeddyView) app.getActiveView());
+		if (view != null) {
+			CompositeEdit edit = new CompositeEdit("Replace And Find");
+			view.fireEdit(edit);
+			view.fireEdit(edit);
+		}
+		return view;
+	}
     
     private void previous(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previous
         TeddyView view = ((TeddyView) app.getActiveView());
         if (view != null) {
             updateMatcher();
             if (matcher != null) {
-                matcher.setStartIndex(view.getSelectionStart() - 1);
-                int pos = matcher.findPrevious();
-                if (pos == -1 && wrapAroundCheck.isSelected()) {
-                    pos = matcher.findPrevious(view.getDocument().getLength());
-                }
-                if (pos == -1) {
+                int pos = pos(view);
+				if (pos == -1) {
                     getToolkit().beep();
                 } else {
                     view.select(pos, matcher.getFindString().length() + pos);
@@ -310,6 +320,15 @@ public class FindDialog extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_previous
+
+	private int pos(TeddyView view) {
+		matcher.setStartIndex(view.getSelectionStart() - 1);
+		int pos = matcher.findPrevious();
+		if (pos == -1 && wrapAroundCheck.isSelected()) {
+			pos = matcher.findPrevious(view.getDocument().getLength());
+		}
+		return pos;
+	}
     
     private void next(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_next
         TeddyView view = ((TeddyView) app.getActiveView());
@@ -356,23 +375,39 @@ public class FindDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_replaceAll
     
     private void updateMatcher() {
-        TeddyView view = ((TeddyView) app.getActiveView());
+        matcher();
+		TeddyView view = ((TeddyView) app.getActiveView());
         if (view != null) {
-            MatchType matchType;
-            switch (modeCombo.getSelectedIndex()) {
-                case 0 : matchType = MatchType.CONTAINS; break;
-                case 1 : matchType = MatchType.STARTS_WITH; break;
-                case 2 : default : matchType = MatchType.FULL_WORD; break;
-            }
-            matcher = new Matcher(view.getDocument(),
-                    findField.getText(),
-                    ! ignoreCaseCheck.isSelected(),
-                    matchType
-                    );
         } else {
             matcher = null;
         }
     }
+
+	private void matcher() {
+		TeddyView view = ((TeddyView) app.getActiveView());
+		if (view != null) {
+			MatchType matchType = matchType();
+			matcher = new Matcher(view.getDocument(), findField.getText(), !ignoreCaseCheck.isSelected(), matchType);
+		} else {
+		}
+	}
+
+	private MatchType matchType() {
+		MatchType matchType;
+		switch (modeCombo.getSelectedIndex()) {
+		case 0:
+			matchType = MatchType.CONTAINS;
+			break;
+		case 1:
+			matchType = MatchType.STARTS_WITH;
+			break;
+		case 2:
+		default:
+			matchType = MatchType.FULL_WORD;
+			break;
+		}
+		return matchType;
+	}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JPanel buttonPanel;

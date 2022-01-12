@@ -79,21 +79,18 @@ public class SelectionOpacityIcon extends javax.swing.ImageIcon {
         Graphics2D g = (Graphics2D) gr;
         super.paintIcon(c, g, x, y);
 
-        Double opacity;
-        Color fillColor;
+        Double opacity = opacity();
+		Color fillColor;
         Color strokeColor;
         DrawingView view = (editor == null) ? null : editor.getActiveView();
         if (view != null && view.getSelectedFigures().size() == 1) {
             Figure f = view.getSelectedFigures().iterator().next();
-            opacity = f.get(opacityKey);
             fillColor = (fillColorKey == null) ? null : f.get(fillColorKey);
             strokeColor = (strokeColorKey == null) ? null : f.get(strokeColorKey);
         } else if (editor != null) {
-            opacity = opacityKey.get(editor.getDefaultAttributes());
             fillColor = (fillColorKey == null) ? null : fillColorKey.get(editor.getDefaultAttributes());
             strokeColor = (strokeColorKey == null) ? null : strokeColorKey.get(editor.getDefaultAttributes());
         } else {
-            opacity = opacityKey.getDefaultValue();
             fillColor = (fillColorKey == null) ? null : fillColorKey.getDefaultValue();
             strokeColor = (strokeColorKey == null) ? null : strokeColorKey.getDefaultValue();
         }
@@ -121,4 +118,18 @@ public class SelectionOpacityIcon extends javax.swing.ImageIcon {
             }
         }
     }
+
+	private Double opacity() {
+		Double opacity;
+		DrawingView view = (editor == null) ? null : editor.getActiveView();
+		if (view != null && view.getSelectedFigures().size() == 1) {
+			Figure f = view.getSelectedFigures().iterator().next();
+			opacity = f.get(opacityKey);
+		} else if (editor != null) {
+			opacity = opacityKey.get(editor.getDefaultAttributes());
+		} else {
+			opacity = opacityKey.getDefaultValue();
+		}
+		return opacity;
+	}
 }

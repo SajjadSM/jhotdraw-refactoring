@@ -220,12 +220,17 @@ public class ToolsToolBar extends AbstractToolBar {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (wasSelectedOnPressed) {
-                DrawingView view = editor.getActiveView();
-                if (view != null) {
-                    view.setHandleDetailLevel(view.getHandleDetailLevel() + 1);
-                }
+                DrawingView view = view();
             }
         }
+
+		private DrawingView view() {
+			DrawingView view = editor.getActiveView();
+			if (view != null) {
+				view.setHandleDetailLevel(view.getHandleDetailLevel() + 1);
+			}
+			return view;
+		}
 
         @Override
         public void mousePressed(MouseEvent e) {

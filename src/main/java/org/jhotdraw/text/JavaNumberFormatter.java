@@ -204,17 +204,8 @@ public class JavaNumberFormatter extends DefaultFormatter {
 
         StringBuilder buf = new StringBuilder();
         if (value instanceof Double) {
-            double v = ((Double) value).doubleValue();
-            v = v * multiplier;
-            String str;
-            BigDecimal big = new BigDecimal(v);
-            int exponent = big.scale() >= 0 ? big.precision() - big.scale() : -big.scale();
-            if (!usesScientificNotation || exponent > minNegativeExponent && exponent < minPositiveExponent) {
-                str = decimalFormat.format(v);
-            } else {
-                str = scientificFormat.format(v);
-            }
-            buf.append(str);
+            String str = str(value);
+			buf.append(str);
         } else if (value instanceof Float) {
             float v = ((Float) value).floatValue();
             v = (float) (v * multiplier);
@@ -252,6 +243,20 @@ public class JavaNumberFormatter extends DefaultFormatter {
         }
         throw new ParseException("Value is of unsupported class " + value, 0);
     }
+
+	private String str(Object value) {
+		double v = ((Double) value).doubleValue();
+		v = v * multiplier;
+		String str;
+		BigDecimal big = new BigDecimal(v);
+		int exponent = big.scale() >= 0 ? big.precision() - big.scale() : -big.scale();
+		if (!usesScientificNotation || exponent > minNegativeExponent && exponent < minPositiveExponent) {
+			str = decimalFormat.format(v);
+		} else {
+			str = scientificFormat.format(v);
+		}
+		return str;
+	}
 
     /**
      * Returns the <code>Object</code> representation of the
