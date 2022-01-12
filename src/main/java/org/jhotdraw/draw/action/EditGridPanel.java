@@ -78,11 +78,15 @@ public class EditGridPanel extends javax.swing.JPanel {
      * @param newValue The GridConstrainer.
      */
     public void setConstrainer(GridConstrainer newValue) {
-        constrainer = newValue;
-        widthField.setValue(constrainer.getWidth());
-        heightField.setValue(constrainer.getHeight());
+        heightField(newValue);
+		widthField.setValue(constrainer.getWidth());
         thetaField.setValue(constrainer.getTheta() * 180d / Math.PI);
     }
+
+	private void heightField(GridConstrainer newValue) {
+		constrainer = newValue;
+		heightField.setValue(constrainer.getHeight());
+	}
     
     /**
      * Returns the GridConstrainer currently being edited by this panel.

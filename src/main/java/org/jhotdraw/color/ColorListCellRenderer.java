@@ -69,16 +69,24 @@ public class ColorListCellRenderer extends DefaultListCellRenderer {
             boolean isSelected,
             boolean cellHasFocus) {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        if (value instanceof Color) {
+        icon(value);
+		if (value instanceof Color) {
             Color c = (Color) value;
-            icon.setColor(c);
             setToolTipText(ColorUtil.toToolTipText(c));
             setText("");
         } else {
-            icon.setColor(null);
             setText("");
         }
         setIcon(icon);
         return this;
     }
+
+	private void icon(Object value) {
+		if (value instanceof Color) {
+			Color c = (Color) value;
+			icon.setColor(c);
+		} else {
+			icon.setColor(null);
+		}
+	}
 }

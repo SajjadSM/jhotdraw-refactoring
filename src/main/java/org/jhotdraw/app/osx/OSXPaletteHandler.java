@@ -111,27 +111,32 @@ public class OSXPaletteHandler {
         return false;
     }
     private void maybeHidePalettes() {
-        boolean hasFocus = false;
-        for (Window window : windows.keySet()) {
-            if (isFocused(window)) {
-                hasFocus = true;
-                break;
-            }
-        }
-        if (! hasFocus && windows.size() > 0) {
-            for (Window palette : palettes) {
-                if (isFocused(palette)) {
-                    hasFocus = true;
-                    break;
-                }
-            }
-        }
-        if (! hasFocus) {
+        boolean hasFocus = hasFocus();
+		if (! hasFocus) {
             for (Window palette : palettes) {
                 palette.setVisible(false);
             }
         }
     }
+
+	private boolean hasFocus() {
+		boolean hasFocus = false;
+		for (Window window : windows.keySet()) {
+			if (isFocused(window)) {
+				hasFocus = true;
+				break;
+			}
+		}
+		if (!hasFocus && windows.size() > 0) {
+			for (Window palette : palettes) {
+				if (isFocused(palette)) {
+					hasFocus = true;
+					break;
+				}
+			}
+		}
+		return hasFocus;
+	}
 
     public void addWindow(Window window) {
         window.addWindowFocusListener(focusHandler);

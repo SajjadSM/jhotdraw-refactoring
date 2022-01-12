@@ -97,17 +97,8 @@ public class CIEXYChromaticityDiagramImageProducer extends MemoryImageSource {
                         continue;
                     }
 
-                    float y = 0.9f - iy * hf;
-                    float z = 1f - x - y;
-
-                    if (y == 0) {
-                        XYZ[0] = XYZ[1] = XYZ[2] = 0;
-                    } else {
-                        XYZ[1] = Y; // Y=Y
-                        XYZ[0] = x * XYZ[1] / y; // X=x*Y/y
-                        XYZ[2] = z * XYZ[1] / y; // Z = (1-x-y)*Y/y
-                    }
-                    int alpha = XYZ[0] >= ceps && XYZ[1] >= ceps && XYZ[2] >= ceps
+                    XYZ = XYZ(hf, Y, XYZ, x, iy);
+					int alpha = XYZ[0] >= ceps && XYZ[1] >= ceps && XYZ[2] >= ceps
                             && XYZ[0] <= 1 - ceps && XYZ[1] <= 1 - ceps && XYZ[2] <= 1 - ceps ? 255 : 0;
                     if (alpha == 255) {
                         //rgb = colorSpace.toRGB(XYZ);
@@ -127,6 +118,19 @@ public class CIEXYChromaticityDiagramImageProducer extends MemoryImageSource {
             }
         }
     }
+
+	private float[] XYZ(float hf, float Y, float[] XYZ, float x, int iy) {
+		float y = 0.9f - iy * hf;
+		float z = 1f - x - y;
+		if (y == 0) {
+			XYZ[0] = XYZ[1] = XYZ[2] = 0;
+		} else {
+			XYZ[1] = Y;
+			XYZ[0] = x * XYZ[1] / y;
+			XYZ[2] = z * XYZ[1] / y;
+		}
+		return XYZ;
+	}
 
     @Nullable public Point getColorLocation(Color c) {
         float[] components = ColorUtil.fromColor(colorSpace, c);
@@ -189,31 +193,33 @@ public class CIEXYChromaticityDiagramImageProducer extends MemoryImageSource {
         } else {
             Rs = 1.055 * Math.pow(Rs, 1 / 2.4) - 0.055;
         }
-        if (Gs <= 0.00304) {
-            Gs = 12.92 * Gs;
-        } else {
-            Gs = 1.055 * Math.pow(Gs, 1 / 2.4) - 0.055;
-        }
-        if (Bs <= 0.00304) {
-            Bs = 12.92 * Bs;
-        } else {
-            Bs = 1.055 * Math.pow(Bs, 1 / 2.4) - 0.055;
-        }
-
-        switch (outsideGamutHandling) {
-            case CLAMP:
-                Rs = Math.min(1, Math.max(0, Rs));
-                Gs = Math.min(1, Math.max(0, Gs));
-                Bs = Math.min(1, Math.max(0, Bs));
-                break;
-        }
-
-
-        rgb[0] = (float) Rs;
-        rgb[1] = (float) Gs;
-        rgb[2] = (float) Bs;
+        rgb = rgbExt(rgb, Gs, Bs, Rs);
 
         //return new float[]{(float) Rs, (float) Gs, (float) Bs};
         //       return sRGB.fromCIEXYZ(ciexyz);
     }
+
+	private float[] rgbExt(float[] rgb, double Gs, double Bs, double Rs) {
+		if (Gs <= 0.00304) {
+			Gs = 12.92 * Gs;
+		} else {
+			Gs = 1.055 * Math.pow(Gs, 1 / 2.4) - 0.055;
+		}
+		if (Bs <= 0.00304) {
+			Bs = 12.92 * Bs;
+		} else {
+			Bs = 1.055 * Math.pow(Bs, 1 / 2.4) - 0.055;
+		}
+		switch (outsideGamutHandling) {
+		case CLAMP:
+			Rs = Math.min(1, Math.max(0, Rs));
+			Gs = Math.min(1, Math.max(0, Gs));
+			Bs = Math.min(1, Math.max(0, Bs));
+			break;
+		}
+		rgb[0] = (float) Rs;
+		rgb[1] = (float) Gs;
+		rgb[2] = (float) Bs;
+		return rgb;
+	}
 }

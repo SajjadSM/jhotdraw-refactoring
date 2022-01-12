@@ -93,11 +93,16 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
 
     @Override
     protected void drawFill(Graphics2D g) {
-        Rectangle2D.Double r = (Rectangle2D.Double) rectangle.clone();
-        double grow = AttributeKeys.getPerpendicularFillGrowth(this);
-        Geom.grow(r, grow, grow);
-        g.fill(r);
+        Rectangle2D.Double r = r();
+		g.fill(r);
     }
+
+	private Rectangle2D.Double r() {
+		Rectangle2D.Double r = (Rectangle2D.Double) rectangle.clone();
+		double grow = AttributeKeys.getPerpendicularFillGrowth(this);
+		Geom.grow(r, grow, grow);
+		return r;
+	}
 
     protected void drawImage(Graphics2D g) {
         BufferedImage image = getBufferedImage();

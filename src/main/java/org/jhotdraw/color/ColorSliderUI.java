@@ -336,21 +336,8 @@ public class ColorSliderUI extends BasicSliderUI {
 
     @Override
     protected void calculateTrackRect() {
-        int centerSpacing = 0; // used to center sliders added using BorderLayout.CENTER (bug 4275631)
-
-
-        if (slider.getOrientation() == JSlider.HORIZONTAL) {
-            centerSpacing = thumbRect.height;
-
-
-            if (slider.getPaintTicks()) {
-                centerSpacing += getTickLength();
-            }
-
-
-            if (slider.getPaintLabels()) {
-                centerSpacing += getHeightOfTallestLabel();
-            }
+        int centerSpacing = centerSpacing();
+		if (slider.getOrientation() == JSlider.HORIZONTAL) {
             trackRect.x = contentRect.x + trackBuffer + 1;
             //trackRect.y = contentRect.y + (contentRect.height - centerSpacing - 1)/2;
             trackRect.height = 14;
@@ -379,6 +366,21 @@ public class ColorSliderUI extends BasicSliderUI {
         }
 
     }
+
+	private int centerSpacing() {
+		int centerSpacing = 0;
+		if (slider.getOrientation() == JSlider.HORIZONTAL) {
+			centerSpacing = thumbRect.height;
+			if (slider.getPaintTicks()) {
+				centerSpacing += getTickLength();
+			}
+			if (slider.getPaintLabels()) {
+				centerSpacing += getHeightOfTallestLabel();
+			}
+		} else {
+		}
+		return centerSpacing;
+	}
 
     @Override
     protected void calculateTickRect() {

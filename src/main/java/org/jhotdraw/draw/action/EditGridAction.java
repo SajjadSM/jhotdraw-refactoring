@@ -59,19 +59,25 @@ public class EditGridAction extends AbstractDrawingViewAction {
         }
 
     protected JDialog getDialog() {
-        if (dialog == null) {
+        settingsPanel();
+		if (dialog == null) {
             ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
             dialog = new JDialog();
             dialog.setTitle(labels.getString("editGrid"));
             dialog.setResizable(false);
-            settingsPanel = new EditGridPanel();
             dialog.add(settingsPanel);
             dialog.pack();
             Preferences prefs = PreferencesUtil.userNodeForPackage(getClass());
             PreferencesUtil.installFramePrefsHandler(prefs, "editGrid", dialog);
             getApplication().addWindow(dialog, null);
         }
-            settingsPanel.setConstrainer((GridConstrainer) getView().getVisibleConstrainer());
-        return dialog;
+            return dialog;
     }
+
+	private void settingsPanel() {
+		if (dialog == null) {
+			settingsPanel = new EditGridPanel();
+		}
+		settingsPanel.setConstrainer((GridConstrainer) getView().getVisibleConstrainer());
+	}
 }

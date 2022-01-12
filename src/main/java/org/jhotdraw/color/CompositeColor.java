@@ -238,16 +238,8 @@ public class CompositeColor extends Color {
         if (cs == null) {
             cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
         }
-        float f[];
-        if (fvalue == null) {
-            f = new float[3];
-            f[0] = ((float) getRed()) / 255f;
-            f[1] = ((float) getGreen()) / 255f;
-            f[2] = ((float) getBlue()) / 255f;
-        } else {
-            f = fvalue;
-        }
-        float tmp[] = cs.toCIEXYZ(f);
+        float[] f = f();
+		float tmp[] = cs.toCIEXYZ(f);
         float tmpout[] = cspace.fromCIEXYZ(tmp);
         if (compArray == null) {
             return tmpout;
@@ -257,6 +249,19 @@ public class CompositeColor extends Color {
         }
         return compArray;
     }
+
+	private float[] f() {
+		float f[];
+		if (fvalue == null) {
+			f = new float[3];
+			f[0] = ((float) getRed()) / 255f;
+			f[1] = ((float) getGreen()) / 255f;
+			f[2] = ((float) getBlue()) / 255f;
+		} else {
+			f = fvalue;
+		}
+		return f;
+	}
 
     /**
      * Returns the <code>ColorSpace</code> of this <code>Color</code>.

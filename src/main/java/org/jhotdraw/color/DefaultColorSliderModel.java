@@ -179,18 +179,21 @@ public class DefaultColorSliderModel extends AbstractColorSlidersModel {
 
     @Override
     public int getInterpolatedRGB(int i, float componentValue) {
-        float[] c = new float[Math.max(3,getComponentCount())];
-        int j = 0;
-        for (DefaultBoundedRangeModel brm : componentModels) {
-            c[j] = ((brm.getValue() - brm.getMinimum())
-                    / (float) (brm.getMaximum() - brm.getMinimum()))
-                    * (colorSpace.getMaxValue(j) - colorSpace.getMinValue(j))
-                    + colorSpace.getMinValue(j);
-            j++;
-        }
-        c[i] = componentValue;
-        return ColorUtil.CStoRGB24(colorSpace, c,c);
+        float[] c = c(i, componentValue);
+		return ColorUtil.CStoRGB24(colorSpace, c,c);
     }
+
+	private float[] c(int i, float componentValue) {
+		float[] c = new float[Math.max(3, getComponentCount())];
+		int j = 0;
+		for (DefaultBoundedRangeModel brm : componentModels) {
+			c[j] = ((brm.getValue() - brm.getMinimum()) / (float) (brm.getMaximum() - brm.getMinimum()))
+					* (colorSpace.getMaxValue(j) - colorSpace.getMinValue(j)) + colorSpace.getMinValue(j);
+			j++;
+		}
+		c[i] = componentValue;
+		return c;
+	}
 
     @Override
     public void setComponent(int i, float newValue) {

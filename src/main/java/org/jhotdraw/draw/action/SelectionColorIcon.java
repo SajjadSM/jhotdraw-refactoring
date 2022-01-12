@@ -63,18 +63,22 @@ public class SelectionColorIcon extends javax.swing.ImageIcon {
     public void paintIcon(java.awt.Component c, java.awt.Graphics gr, int x, int y) {
         Graphics2D g = (Graphics2D) gr;
         super.paintIcon(c, g, x, y);
-        Color color;
-        DrawingView view = editor.getActiveView();
-        if (view != null && view.getSelectedFigures().size() == 1) {
-            color = view.getSelectedFigures().iterator().next().get(key);
-        } else {
-            color = key.get(editor.getDefaultAttributes());
-        }
-        if (color != null) {
+        Color color = color();
+		if (color != null) {
             g.setColor(color);
             g.translate(x, y);
             g.fill(colorShape);
             g.translate(-x, -y);
         }
     }
+	private Color color() {
+		Color color;
+		DrawingView view = editor.getActiveView();
+		if (view != null && view.getSelectedFigures().size() == 1) {
+			color = view.getSelectedFigures().iterator().next().get(key);
+		} else {
+			color = key.get(editor.getDefaultAttributes());
+		}
+		return color;
+	}
 }

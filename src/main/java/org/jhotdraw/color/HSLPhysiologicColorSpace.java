@@ -37,15 +37,10 @@ public class HSLPhysiologicColorSpace extends AbstractNamedColorSpace {
 
     @Override
     public float[] toRGB(float[] components, float[] rgb) {
-        float hue = components[0];
-        float saturation = components[1];
+        float hk = hk(components);
+		float saturation = components[1];
         float lightness = components[2];
 
-        // normalize hue
-        hue = hue - (float) Math.floor(hue);
-        if (hue < 0) {
-            hue = 1f + hue;
-        }
         // normalize saturation
         if (saturation > 1f) {
             saturation = 1f;
@@ -57,27 +52,6 @@ public class HSLPhysiologicColorSpace extends AbstractNamedColorSpace {
             lightness = 1f;
         } else if (lightness < 0f) {
             lightness = 0f;
-        }
-
-        float hueDeg = hue * 360f;
-        if (hueDeg < 0) {
-            hueDeg += 360f;
-        }
-        // compute hi and f from hue
-        // float f;
-        float hk = hue - (float) Math.floor(hue); // / 360f;
-        if (hueDeg < 120f) { // red to yellow
-            hk /= 2f;
-        } else if (hueDeg < 160f) { // yellow to green
-            hk = (hk - 120f / 360f) * 3f / 2f + 60f / 360f;
-        } else if (hueDeg < 220f) { // green to cyan
-            hk = (hk - 160f / 360f) + 120f / 360f;
-        } else if (hueDeg < 280f) { // cyan to blue
-            hk = (hk - 220f / 360f) + 180f / 360f;
-        } else if (hueDeg < 340f) { // blue to purple
-            hk = (hk - 280f / 360f) + 240f / 360f;
-        } else { // purple to red
-            hk = (hk - 340f / 360f) * 3f + 300f / 360f;
         }
 
         // compute p and q from saturation and lightness
@@ -148,6 +122,33 @@ public class HSLPhysiologicColorSpace extends AbstractNamedColorSpace {
         rgb[2] = blue;
         return rgb;
     }
+
+	private float hk(float[] components) {
+		float hue = components[0];
+		hue = hue - (float) Math.floor(hue);
+		if (hue < 0) {
+			hue = 1f + hue;
+		}
+		float hueDeg = hue * 360f;
+		if (hueDeg < 0) {
+			hueDeg += 360f;
+		}
+		float hk = hue - (float) Math.floor(hue);
+		if (hueDeg < 120f) {
+			hk /= 2f;
+		} else if (hueDeg < 160f) {
+			hk = (hk - 120f / 360f) * 3f / 2f + 60f / 360f;
+		} else if (hueDeg < 220f) {
+			hk = (hk - 160f / 360f) + 120f / 360f;
+		} else if (hueDeg < 280f) {
+			hk = (hk - 220f / 360f) + 180f / 360f;
+		} else if (hueDeg < 340f) {
+			hk = (hk - 280f / 360f) + 240f / 360f;
+		} else {
+			hk = (hk - 340f / 360f) * 3f + 300f / 360f;
+		}
+		return hk;
+	}
 
     @Override
     public float[] fromRGB(float[] rgbvalue, float[] component) {

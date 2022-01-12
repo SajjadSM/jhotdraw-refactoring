@@ -37,7 +37,8 @@ public class HSLColorSpace extends AbstractNamedColorSpace {
 
     @Override
     public float[] toRGB(float[] components, float[] rgb) {
-        float hue = components[0];
+        float blue = blue(components);
+		float hue = components[0];
         float saturation = components[1];
         float lightness = components[2];
 
@@ -56,8 +57,6 @@ public class HSLColorSpace extends AbstractNamedColorSpace {
         // compute red, green and blue
         float red = hk + 1f / 3f;
         float green = hk;
-        float blue = hk - 1f / 3f;
-
         // normalize rgb values
         if (red < 0) {
             red = red + 1f;
@@ -70,13 +69,6 @@ public class HSLColorSpace extends AbstractNamedColorSpace {
         } else if (green > 1) {
             green = green - 1f;
         }
-
-        if (blue < 0) {
-            blue = blue + 1f;
-        } else if (blue > 1) {
-            blue = blue - 1f;
-        }
-
 
         // adjust rgb values
         if (red < 1f / 6f) {
@@ -99,22 +91,41 @@ public class HSLColorSpace extends AbstractNamedColorSpace {
             green = p;
         }
 
-        if (blue < 1f / 6f) {
-            blue = p + ((q - p) * 6 * blue);
-        } else if (blue < 0.5f) {
-            blue = q;
-        } else if (blue < 2f / 3f) {
-            blue = p + ((q - p) * 6 * (2f / 3f - blue));
-        } else {
-            blue = p;
-        }
-
-
         rgb[0]=clamp(red,0,1);
         rgb[1]=clamp(green,0,1);
         rgb[2]=clamp(blue,0,1);
         return rgb;
     }
+
+	private float blue(float[] components) {
+		float hue = components[0];
+		float saturation = components[1];
+		float lightness = components[2];
+		float q;
+		if (lightness < 0.5f) {
+			q = lightness * (1f + saturation);
+		} else {
+			q = lightness + saturation - (lightness * saturation);
+		}
+		float p = 2f * lightness - q;
+		float hk = hue - (float) Math.floor(hue);
+		float blue = hk - 1f / 3f;
+		if (blue < 0) {
+			blue = blue + 1f;
+		} else if (blue > 1) {
+			blue = blue - 1f;
+		}
+		if (blue < 1f / 6f) {
+			blue = p + ((q - p) * 6 * blue);
+		} else if (blue < 0.5f) {
+			blue = q;
+		} else if (blue < 2f / 3f) {
+			blue = p + ((q - p) * 6 * (2f / 3f - blue));
+		} else {
+			blue = p;
+		}
+		return blue;
+	}
 
     @Override
     public float[] fromRGB(float[] rgbvalue, float[] component) {

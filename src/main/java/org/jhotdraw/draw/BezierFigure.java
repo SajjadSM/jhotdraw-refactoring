@@ -299,14 +299,19 @@ public class BezierFigure extends AbstractAttributedFigure {
 
     @Override
     public <T> void set(AttributeKey<T> key, T newValue) {
-        if (key == PATH_CLOSED) {
-            path.setClosed((Boolean) newValue);
-        } else if (key == WINDING_RULE) {
-            path.setWindingRule(newValue == AttributeKeys.WindingRule.EVEN_ODD ? Path2D.Double.WIND_EVEN_ODD : Path2D.Double.WIND_NON_ZERO);
-        }
-        super.set(key, newValue);
-        invalidate();
+        path(key, newValue);
+		super.set(key, newValue);
     }
+
+	private <T> void path(AttributeKey<T> key, T newValue) {
+		if (key == PATH_CLOSED) {
+			path.setClosed((Boolean) newValue);
+		} else if (key == WINDING_RULE) {
+			path.setWindingRule(newValue == AttributeKeys.WindingRule.EVEN_ODD ? Path2D.Double.WIND_EVEN_ODD
+					: Path2D.Double.WIND_NON_ZERO);
+		}
+		invalidate();
+	}
 
     /**
      * Sets the location of the first and the last <code>BezierPath.Node</code>
