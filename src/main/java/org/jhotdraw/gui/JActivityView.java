@@ -111,35 +111,18 @@ public class JActivityView extends javax.swing.JPanel {
             return;
         }
         String name = evt.getPropertyName();
-        if (name == ActivityModel.NOTE_PROPERTY) {
-            jActivityViewProduct.updateNote(this.model);
-        } else if (name == ActivityModel.WARNING_PROPERTY) {
-            jActivityViewProduct.updateWarning(this.model, this);
-        } else if (name == ActivityModel.ERROR_PROPERTY) {
-            jActivityViewProduct.updateError(this.model, this);
-        } else if (name == ActivityModel.CANCELABLE_PROPERTY) {
-            updateCancelable();
-        } else if (name == ActivityModel.CANCELED_PROPERTY) {
-            updateCanceled();
-            updateCancelable();
-        } else if (name == ActivityModel.INDETERMINATE_PROPERTY) {
-            updateIndeterminate();
-        } else if (name == ActivityModel.CLOSED_PROPERTY) {
-            updateCancelable();
-            updateCanceled();
-            updateClosed();
-        }
+        getNameObject(name).updateProperties(this);
     }
 
     private void updateTitle() {
         titleLabel.setText(model.getTitle());
     }
 
-    private void updateIndeterminate() {
+    public void updateIndeterminate() {
         progressBar.setIndeterminate(model.isIndeterminate());
     }
 
-    private void updateCancelable() {
+    public void updateCancelable() {
         boolean b = model.isCancelable() && !model.isClosed();
         if (cancelButton.isVisible() != b) {
             cancelButton.setVisible(b);
@@ -147,7 +130,7 @@ public class JActivityView extends javax.swing.JPanel {
         }
     }
 
-    private void updateCanceled() {
+    public void updateCanceled() {
         boolean b = model.isCancelable() && !model.isCanceled() && !model.isClosed();
         if (cancelButton.isEnabled() != b) {
             cancelButton.setEnabled(b);
@@ -155,7 +138,7 @@ public class JActivityView extends javax.swing.JPanel {
         }
     }
 
-    private void updateClosed() {
+    public void updateClosed() {
         boolean b = model.isClosed();
         if (progressBar.isEnabled() == b) {
             closeButton.setVisible(model.getError() != null);
@@ -283,4 +266,28 @@ public class JActivityView extends javax.swing.JPanel {
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JSeparator separator;
     private javax.swing.JLabel titleLabel;
+
+	private Name getNameObject(String name) {
+		switch (name) {
+		case ActivityModel.CLOSED_PROPERTY:
+			return new ClosedProperty();
+		case ActivityModel.INDETERMINATE_PROPERTY:
+			return new IndeterminateProperty();
+		case ActivityModel.CANCELED_PROPERTY:
+			return new CanceledProperty();
+		case ActivityModel.CANCELABLE_PROPERTY:
+			return new CancelableProperty();
+		case ActivityModel.ERROR_PROPERTY:
+			return new ErrorProperty();
+		case ActivityModel.WARNING_PROPERTY:
+			return new WarningProperty();
+		case ActivityModel.NOTE_PROPERTY:
+			return new NoteProperty();
+		}
+		return null;
+	}
+
+	public JActivityViewProduct getJActivityViewProduct() {
+		return jActivityViewProduct;
+	}
 }

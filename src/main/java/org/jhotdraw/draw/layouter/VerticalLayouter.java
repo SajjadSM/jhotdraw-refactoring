@@ -78,35 +78,8 @@ public class VerticalLayouter extends AbstractLayouter {
 				Insets2D.Double insets = getInsets(child);
 				double height = child.getPreferredSize().height;
 				double width = child.getPreferredSize().width;
-				switch (compositeAlignment) {
-				case LEADING:
-					child.setBounds(
-							new Point2D.Double(layoutBounds.x + layoutInsets.left + insets.left, y + insets.top),
-							new Point2D.Double(layoutBounds.x + +layoutInsets.left + insets.left + width,
-									y + insets.top + height));
-					break;
-				case TRAILING:
-					child.setBounds(
-							new Point2D.Double(
-									layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right - width,
-									y + insets.top),
-							new Point2D.Double(layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
-									y + insets.top + height));
-					break;
-				case CENTER:
-					child.setBounds(
-							new Point2D.Double(layoutBounds.x + (layoutBounds.width - width) / 2d, y + insets.top),
-							new Point2D.Double(layoutBounds.x + (layoutBounds.width + width) / 2d,
-									y + insets.top + height));
-					break;
-				case BLOCK:
-				default:
-					child.setBounds(
-							new Point2D.Double(layoutBounds.x + layoutInsets.left + insets.left, y + insets.top),
-							new Point2D.Double(layoutBounds.x + layoutBounds.width - layoutInsets.right - insets.right,
-									y + insets.top + height));
-					break;
-				}
+				getCompositeAlignment2Object(compositeAlignment).y(child, layoutBounds, layoutInsets, insets, y, width,
+						height);
 				y += height + insets.top + insets.bottom;
 			}
 		}
@@ -119,5 +92,19 @@ public class VerticalLayouter extends AbstractLayouter {
 			layoutInsets = new Insets2D.Double();
 		}
 		return layoutInsets;
+	}
+
+	private CompositeAlignment2 getCompositeAlignment2Object(Alignment compositeAlignment) {
+		switch (compositeAlignment) {
+		case LEADING:
+			return new Leading2();
+		case TRAILING:
+			return new Trailing2();
+		case CENTER:
+			return new Center2();
+		case BLOCK:
+			return new Block2();
+		}
+		return null;
 	}
 }

@@ -45,17 +45,7 @@ public class JMDIDesktopPane extends JDesktopPane implements Arrangeable {
     @Override
     public void setArrangement(Arrangeable.Arrangement newValue) {
         Arrangeable.Arrangement oldValue = getArrangement();
-        switch (newValue) {
-            case CASCADE :
-                arrangeFramesCascading();
-                break;
-            case HORIZONTAL :
-                arrangeFramesHorizontally();
-                break;
-            case VERTICAL :
-                arrangeFramesVertically();
-                break;
-        }
+        getNewValueObject(newValue).setArrangement(this);
         firePropertyChange("arrangement", oldValue, newValue);
     }
     
@@ -69,7 +59,7 @@ public class JMDIDesktopPane extends JDesktopPane implements Arrangeable {
     /**
      * Cascade all internal frames
      */
-    private void arrangeFramesCascading() {
+    public void arrangeFramesCascading() {
         JInternalFrame[] allFrames = getAllFrames();
         
         // do nothing if no frames to work with
@@ -297,6 +287,18 @@ public class JMDIDesktopPane extends JDesktopPane implements Arrangeable {
             manager.resizeDesktop();
         }
     }
+
+	private NewValue getNewValueObject(Arrangeable.Arrangement newValue) {
+		switch (newValue) {
+		case CASCADE:
+			return new Cascade();
+		case HORIZONTAL:
+			return new Horizontal();
+		case VERTICAL:
+			return new Vertical();
+		}
+		return null;
+	}
     
 }
 /**
