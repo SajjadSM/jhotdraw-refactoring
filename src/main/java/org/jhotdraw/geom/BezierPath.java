@@ -1245,4 +1245,8 @@ public class BezierPath extends ArrayList<BezierPath.Node>
     public int getWindingRule() {
         return windingRule;
     }
+
+	public Point2D.Double getOutermostPoint() {
+		return get(indexOfOutermostNode()).getControlPoint(0);
+	}
 }

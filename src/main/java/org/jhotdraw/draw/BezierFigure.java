@@ -626,7 +626,7 @@ public class BezierFigure extends AbstractAttributedFigure {
     }
 
     public Point2D.Double getOutermostPoint() {
-        return path.get(path.indexOfOutermostNode()).getControlPoint(0);
+        return path.getOutermostPoint();
     }
 
     /**
