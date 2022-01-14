@@ -41,8 +41,8 @@ import org.jhotdraw.samples.svg.figures.*;
  * @version $Id$
  */
 public class ActionsToolBar extends AbstractToolBar {
-    private ActionsToolBarProduct actionsToolBarProduct = new ActionsToolBarProduct();
-	@Nullable private UndoRedoManager undoManager;
+    @Nullable private UndoRedoManager undoManager;
+    private ArrayList<Action> actions;
     private JPopupButton popupButton;
 
     /** Creates new instance. */
@@ -85,7 +85,12 @@ public class ActionsToolBar extends AbstractToolBar {
      * Set this to null to set the drop down menus to the default actions.
      */
     public void setPopupActions(List<Action> actions) {
-        actionsToolBarProduct.setPopupActions(actions);
+        if (actions == null) {
+            this.actions = null;
+        } else {
+            this.actions = new ArrayList<Action>();
+            this.actions.addAll(actions);
+        }
     }
 
     /** Gets the actions of the "Action" popup menu in the toolbar.
@@ -95,7 +100,10 @@ public class ActionsToolBar extends AbstractToolBar {
      * @return An unmodifiable list with actions.
      */
     public List<Action> getPopupActions() {
-        return actionsToolBarProduct.getPopupActions();
+        if (actions == null) {
+            actions = new ArrayList<Action>();
+        }
+        return Collections.unmodifiableList(actions);
     }
 
     @Override
@@ -198,9 +206,9 @@ public class ActionsToolBar extends AbstractToolBar {
             pb.add(d = new SelectSameAction(editor));
             disposables.add(d);
             pb.add(new ClearSelectionAction());
-            if (!actionsToolBarProduct.getPopupActions().isEmpty()) {
+            if (!getPopupActions().isEmpty()) {
                 pb.addSeparator();
-                for (Action a : actionsToolBarProduct.getPopupActions()) {
+                for (Action a : getPopupActions()) {
                     if (a == null) {
                         pb.addSeparator();
                     } else {
