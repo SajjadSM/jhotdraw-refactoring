@@ -102,7 +102,7 @@ public class AbstractBean extends Object implements java.io.Serializable, Clonea
         propertySupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    protected void firePropertyChange(String propertyName, @Nullable Object oldValue, @Nullable Object newValue) {
+    public void firePropertyChange(String propertyName, @Nullable Object oldValue, @Nullable Object newValue) {
         propertySupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 

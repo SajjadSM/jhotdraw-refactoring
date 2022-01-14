@@ -1,4 +1,8 @@
 eclipse.preferences.version=1
+encoding//src/main/java/org/jhotdraw/app/AbstractApplicationModelProduct.java=UTF-8
+encoding//src/main/java/org/jhotdraw/app/action/AbstractViewActionProduct.java=UTF-8
+encoding//src/main/java/org/jhotdraw/app/action/view/ViewPropertyActionProduct.java=UTF-8
+encoding//src/main/java/org/jhotdraw/app/osx/OSXAdapterProduct.java=UTF-8
 encoding//src/main/java/org/jhotdraw/draw/print/DrawingPageableProduct.java=UTF-8
 encoding//src/main/java/org/jhotdraw/gui/JActivityViewProduct.java=UTF-8
 encoding//src/main/java/org/jhotdraw/gui/JLifeFormattedTextAreaProduct.java=UTF-8

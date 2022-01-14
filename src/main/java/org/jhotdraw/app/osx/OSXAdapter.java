@@ -89,10 +89,8 @@ import java.lang.reflect.*;
  */
 public class OSXAdapter implements InvocationHandler {
 
-    protected ActionListener targetAction;
-    protected Object targetObject;
-    protected Method targetMethod;
-    protected String proxySignature;
+    private static OSXAdapterProduct oSXAdapterProduct = new OSXAdapterProduct();
+	protected String proxySignature;
     static Object macOSXApplication;
 
     /**
@@ -195,7 +193,7 @@ public class OSXAdapter implements InvocationHandler {
                     try {
                         Method getFilenameMethod = appleEvent.getClass().getDeclaredMethod("getFilename", (Class[]) null);
                         String filename = (String) getFilenameMethod.invoke(appleEvent, (Object[]) null);
-                        targetAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, filename));
+                        oSXAdapterProduct.getTargetAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, filename));
                     } catch (Exception ex) {
                     }
                 }
@@ -222,7 +220,7 @@ public class OSXAdapter implements InvocationHandler {
                     try {
                         Method getFilenameMethod = appleEvent.getClass().getDeclaredMethod("getFilename", (Class[]) null);
                         String filename = (String) getFilenameMethod.invoke(appleEvent, (Object[]) null);
-                        targetAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, filename));
+                        oSXAdapterProduct.getTargetAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, filename));
                     } catch (Exception ex) {
                     }
                 }
@@ -262,8 +260,8 @@ public class OSXAdapter implements InvocationHandler {
      */
     protected OSXAdapter(String proxySignature, Object target, Method handler) {
         this.proxySignature = proxySignature;
-        this.targetObject = target;
-        this.targetMethod = handler;
+        oSXAdapterProduct.setTargetObject(target);
+        oSXAdapterProduct.setTargetMethod(handler);
     }
 
     /**
@@ -273,7 +271,7 @@ public class OSXAdapter implements InvocationHandler {
      */
     protected OSXAdapter(String proxySignature, ActionListener handler) {
         this.proxySignature = proxySignature;
-        this.targetAction = handler;
+        oSXAdapterProduct.setTargetAction(handler);
     }
 
     /** Override this method to perform any operations on the event
@@ -281,16 +279,7 @@ public class OSXAdapter implements InvocationHandler {
      * See setOpenFileHandler above for an example.
      */
     public boolean callTarget(Object appleEvent) throws InvocationTargetException, IllegalAccessException {
-        if (targetAction != null) {
-            targetAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, proxySignature));
-            return true;
-        } else {
-            Object result = targetMethod.invoke(targetObject, (Object[]) null);
-            if (result == null) {
-                return true;
-            }
-            return Boolean.valueOf(result.toString()).booleanValue();
-        }
+        return oSXAdapterProduct.callTarget(appleEvent, this.proxySignature, this);
     }
 
     /**
@@ -301,7 +290,7 @@ public class OSXAdapter implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
-            boolean handled = callTarget(args[0]);
+            boolean handled = oSXAdapterProduct.callTarget(args[0], this.proxySignature, this);
             setApplicationEventHandled(args[0], handled);
         }
         // All of the ApplicationListener methods are void;

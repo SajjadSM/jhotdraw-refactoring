@@ -28,12 +28,10 @@ import org.jhotdraw.app.action.ActionUtil;
  * @version $Id$
  */
 public class ViewPropertyAction extends AbstractViewAction {
-    private String propertyName;
+    private ViewPropertyActionProduct viewPropertyActionProduct = new ViewPropertyActionProduct();
+	private String propertyName;
     private Class[] parameterClass;
-    private Object propertyValue;
     private String setterName;
-    private String getterName;
-    
     private PropertyChangeListener viewListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -51,12 +49,12 @@ public class ViewPropertyAction extends AbstractViewAction {
         super(app, view);
         this.propertyName = propertyName;
         this.parameterClass = new Class[] { propertyClass };
-        this.propertyValue = propertyValue;
+        viewPropertyActionProduct.setPropertyValue(propertyValue);
         setterName = "set"+Character.toUpperCase(propertyName.charAt(0)) +
                 propertyName.substring(1);
-        getterName = ((propertyClass == Boolean.TYPE || propertyClass == Boolean.class) ? "is" : "get")+
-                Character.toUpperCase(propertyName.charAt(0)) +
-                propertyName.substring(1);
+        viewPropertyActionProduct
+				.setGetterName(((propertyClass == Boolean.TYPE || propertyClass == Boolean.class) ? "is" : "get")
+						+ Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1));
         updateSelectedState();
     }
     
@@ -64,7 +62,7 @@ public class ViewPropertyAction extends AbstractViewAction {
     public void actionPerformed(ActionEvent evt) {
         View p = getActiveView();
         try {
-            p.getClass().getMethod(setterName, parameterClass).invoke(p, new Object[] {propertyValue});
+            p.getClass().getMethod(setterName, parameterClass).invoke(p, new Object[] {viewPropertyActionProduct.getPropertyValue()});
         } catch (Throwable e) {
                 InternalError error = new InternalError("Method invocation failed. setter:"+setterName+" object:"+p);
             error.initCause(e);
@@ -88,7 +86,7 @@ public class ViewPropertyAction extends AbstractViewAction {
     private void updateSelectedState() {
         boolean isSelected;
 		try {
-			isSelected = isSelected();
+			isSelected = viewPropertyActionProduct.isSelected(this);
 			putValue(ActionUtil.SELECTED_KEY, isSelected);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
@@ -107,24 +105,9 @@ public class ViewPropertyAction extends AbstractViewAction {
 			e.printStackTrace();
 		}
     }
-	private boolean isSelected() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		boolean isSelected = false;
-		View p = getActiveView();
-		if (p != null) {
-			Object value = p.getClass().getMethod(getterName, (Class[]) null).invoke(p);
-			isSelected = value == propertyValue
-					|| value != null && propertyValue != null && value.equals(propertyValue);
-			try {
-				value = p.getClass().getMethod(getterName, (Class[]) null).invoke(p);
-				isSelected = value == propertyValue
-						|| value != null && propertyValue != null && value.equals(propertyValue);
-			} catch (Throwable e) {
-				InternalError error = new InternalError(
-						"Method invocation failed. getter:" + getterName + " object:" + p);
-				error.initCause(e);
-				throw error;
-			}
-		}
-		return isSelected;
+	public Object clone() throws java.lang.CloneNotSupportedException {
+		ViewPropertyAction clone = (ViewPropertyAction) super.clone();
+		clone.viewPropertyActionProduct = (ViewPropertyActionProduct) this.viewPropertyActionProduct.clone();
+		return clone;
 	}
 }
