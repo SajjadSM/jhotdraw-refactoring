@@ -311,7 +311,7 @@ public class FindDialog extends javax.swing.JDialog {
         if (view != null) {
             updateMatcher();
             if (matcher != null) {
-                int pos = pos(view);
+                int pos = matcher.pos(view, wrapAroundCheck);
 				if (pos == -1) {
                     getToolkit().beep();
                 } else {
@@ -321,16 +321,7 @@ public class FindDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_previous
 
-	private int pos(TeddyView view) {
-		matcher.setStartIndex(view.getSelectionStart() - 1);
-		int pos = matcher.findPrevious();
-		if (pos == -1 && wrapAroundCheck.isSelected()) {
-			pos = matcher.findPrevious(view.getDocument().getLength());
-		}
-		return pos;
-	}
-    
-    private void next(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_next
+	private void next(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_next
         TeddyView view = ((TeddyView) app.getActiveView());
         if (view != null) {
             updateMatcher();

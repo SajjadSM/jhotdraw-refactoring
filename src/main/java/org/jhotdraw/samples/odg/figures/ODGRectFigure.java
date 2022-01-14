@@ -216,8 +216,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
     }
 
     public void setArc(Dimension2DDouble arc) {
-        roundrect.arcwidth = Math.max(0d, Math.min(roundrect.width, arc.width * 2d));
-        roundrect.archeight = Math.max(0d, Math.min(roundrect.height, arc.height * 2d));
+        arc.setArc(roundrect);
     }
 
     public Dimension2DDouble getArc() {

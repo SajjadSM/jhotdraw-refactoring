@@ -10,7 +10,9 @@
  */
 package org.jhotdraw.samples.teddy.regex;
 
+import javax.swing.JCheckBox;
 import javax.swing.text.*;
+import org.jhotdraw.samples.teddy.TeddyView;
 
 /**
  * Searches for an occurence of a case (in)sensitive text on a document.
@@ -289,5 +291,14 @@ public class Matcher {
             return false;
         }
     }
+
+	public int pos(TeddyView view, javax.swing.JCheckBox wrapAroundCheck) {
+		setStartIndex(view.getSelectionStart() - 1);
+		int pos = findPrevious();
+		if (pos == -1 && wrapAroundCheck.isSelected()) {
+			pos = findPrevious(view.getDocument().getLength());
+		}
+		return pos;
+	}
 }
 

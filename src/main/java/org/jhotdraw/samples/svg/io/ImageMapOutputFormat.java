@@ -190,7 +190,7 @@ public class ImageMapOutputFormat implements OutputFormat {
         } else if (f instanceof SVGPathFigure) {
             SVGPathFigure path = (SVGPathFigure) f;
             if (path.getChildCount() == 1) {
-                boolean isLinear = isLinear(path);
+                boolean isLinear = path.isLinear();
 				BezierFigure bezier = (BezierFigure) path.getChild(0);
                 if (isLinear) {
                     if (bezier.isClosed()) {
@@ -219,19 +219,7 @@ public class ImageMapOutputFormat implements OutputFormat {
         }
     }
 
-	private boolean isLinear(SVGPathFigure path) {
-		BezierFigure bezier = (BezierFigure) path.getChild(0);
-		boolean isLinear = true;
-		for (int i = 0, n = bezier.getNodeCount(); i < n; i++) {
-			if (bezier.getNode(i).getMask() != 0) {
-				isLinear = false;
-				break;
-			}
-		}
-		return isLinear;
-	}
-
-    /**
+	/**
      * Writes the <code>shape</code>, <code>coords</code>, <code>href</code>,
      * <code>nohref</code> Attribute for the specified figure and ellipse.
      *
