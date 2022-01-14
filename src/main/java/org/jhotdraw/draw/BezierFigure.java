@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.connector.ChopBezierConnector;
 import org.jhotdraw.draw.handle.TransformHandleKit;
+import org.jhotdraw.draw.tool.BezierTool;
 import org.jhotdraw.draw.handle.BezierNodeHandle;
 import org.jhotdraw.draw.handle.BezierOutlineHandle;
 import org.jhotdraw.draw.handle.BezierScaleHandle;
@@ -743,4 +744,23 @@ public class BezierFigure extends AbstractAttributedFigure {
         }
         in.closeElement();
     }
+
+	public void addPointToFigure(Point2D.Double newPoint, BezierTool bezierTool) {
+		int pointCount = getNodeCount();
+		willChange();
+		if (pointCount < 2) {
+			addNode(new BezierPath.Node(newPoint));
+		} else {
+			Point2D.Double endPoint = getEndPoint();
+			Point2D.Double secondLastPoint = (pointCount <= 1) ? endPoint : getPoint(pointCount - 2, 0);
+			if (newPoint.equals(endPoint)) {
+			} else if (pointCount > 1 && Geom.lineContainsPoint(newPoint.x, newPoint.y, secondLastPoint.x,
+					secondLastPoint.y, endPoint.x, endPoint.y, 0.9f / bezierTool.getView().getScaleFactor())) {
+				setPoint(pointCount - 1, 0, newPoint);
+			} else {
+				addNode(new BezierPath.Node(newPoint));
+			}
+		}
+		changed();
+	}
 }

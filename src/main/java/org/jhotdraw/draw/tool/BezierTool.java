@@ -140,8 +140,8 @@ public class BezierTool extends AbstractTool {
             getDrawing().add(createdFigure);
         } else {
             if (evt.getClickCount() == 1) {
-                addPointToFigure(creationView.getConstrainer().constrainPoint(
-                        creationView.viewToDrawing(anchor)));
+                createdFigure.addPointToFigure(creationView.getConstrainer().constrainPoint(
+                        creationView.viewToDrawing(anchor)), this);
             }
         }
         nodeCountBeforeDrag = createdFigure.getNodeCount();
@@ -168,23 +168,7 @@ public class BezierTool extends AbstractTool {
     }
 
     protected void addPointToFigure(Point2D.Double newPoint) {
-        int pointCount = createdFigure.getNodeCount();
-
-        createdFigure.willChange();
-        if (pointCount < 2) {
-            createdFigure.addNode(new BezierPath.Node(newPoint));
-        } else {
-            Point2D.Double endPoint = createdFigure.getEndPoint();
-            Point2D.Double secondLastPoint = (pointCount <= 1) ? endPoint : createdFigure.getPoint(pointCount - 2, 0);
-            if (newPoint.equals(endPoint)) {
-                // nothing to do
-            } else if (pointCount > 1 && Geom.lineContainsPoint(newPoint.x, newPoint.y, secondLastPoint.x, secondLastPoint.y, endPoint.x, endPoint.y, 0.9f / getView().getScaleFactor())) {
-                createdFigure.setPoint(pointCount - 1, 0, newPoint);
-            } else {
-                createdFigure.addNode(new BezierPath.Node(newPoint));
-            }
-        }
-        createdFigure.changed();
+        createdFigure.addPointToFigure(newPoint, this);
     }
 
     @Override
@@ -305,7 +289,7 @@ public class BezierTool extends AbstractTool {
         }
         int x = evt.getX();
         int y = evt.getY();
-        addPointToFigure(getView().viewToDrawing(new Point(x, y)));
+        createdFigure.addPointToFigure(getView().viewToDrawing(new Point(x, y)), this);
     }
 
     @Override
