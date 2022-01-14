@@ -36,11 +36,8 @@ import org.jhotdraw.util.*;
  */
 public class JSheet extends JDialog {
 
-    /**
-     * Event listener list.
-     */
-    protected EventListenerList listenerList = new EventListenerList();
-    /**
+    private JSheetProduct2 jSheetProduct2 = new JSheetProduct2();
+	/**
      * This handler is used to handle movements of the owner. If the owner
      * moves, we have to change the location of the sheet as well.
      */
@@ -273,7 +270,7 @@ public class JSheet extends JDialog {
     /**
      * If this returns true, the JSheet uses native support for sheet display.
      */
-    private static boolean isNativeSheetSupported() {
+    public static boolean isNativeSheetSupported() {
         return isNativeSheetSupported;
     }
 
@@ -461,14 +458,14 @@ public class JSheet extends JDialog {
      * Adds a sheet listener.
      */
     public void addSheetListener(SheetListener l) {
-        listenerList.add(SheetListener.class, l);
+        jSheetProduct2.getJSheetProduct().addSheetListener(l);
     }
 
     /**
      * Removes a sheet listener.
      */
     public void removeSheetListener(SheetListener l) {
-        listenerList.remove(SheetListener.class, l);
+        jSheetProduct2.getJSheetProduct().removeSheetListener(l);
     }
 
     /**
@@ -477,34 +474,7 @@ public class JSheet extends JDialog {
      * parameters passed into the fire method.
      */
     protected void fireOptionSelected(JOptionPane pane) {
-        Object value = pane.getValue();
-        int option;
-
-        if (value == null) {
-            option = JOptionPane.CLOSED_OPTION;
-        } else {
-            if (pane.getOptions() == null) {
-                if (value instanceof Integer) {
-                    option = ((Integer) value).intValue();
-                } else {
-                    option = JOptionPane.CLOSED_OPTION;
-                }
-            } else {
-                option = JOptionPane.CLOSED_OPTION;
-                Object[] options = pane.getOptions();
-                for (int i = 0, n = options.length; i < n; i++) {
-                    if (options[i].equals(value)) {
-                        option = i;
-                        break;
-                    }
-                }
-                if (option == JOptionPane.CLOSED_OPTION) {
-                    value = null;
-                }
-            }
-        }
-
-        fireOptionSelected(pane, option, value, pane.getInputValue());
+        jSheetProduct2.fireOptionSelected(pane, this);
     }
 
     /**
@@ -513,20 +483,7 @@ public class JSheet extends JDialog {
      * parameters passed into the fire method.
      */
     protected void fireOptionSelected(JOptionPane pane, int option, @Nullable Object value, @Nullable Object inputValue) {
-        SheetEvent sheetEvent = null;
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == SheetListener.class) {
-                // Lazily create the event:
-                if (sheetEvent == null) {
-                    sheetEvent = new SheetEvent(this, pane, option, value, inputValue);
-                }
-                ((SheetListener) listeners[i + 1]).optionSelected(sheetEvent);
-            }
-        }
+        jSheetProduct2.getJSheetProduct().fireOptionSelected(pane, option, value, inputValue, this);
     }
 
     /**
@@ -535,20 +492,7 @@ public class JSheet extends JDialog {
      * parameters passed into the fire method.
      */
     protected void fireOptionSelected(JFileChooser pane, int option) {
-        SheetEvent sheetEvent = null;
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == SheetListener.class) {
-                // Lazily create the event:
-                if (sheetEvent == null) {
-                    sheetEvent = new SheetEvent(this, pane, option, null);
-                }
-                ((SheetListener) listeners[i + 1]).optionSelected(sheetEvent);
-            }
-        }
+        jSheetProduct2.getJSheetProduct().fireOptionSelected(pane, option, this);
     }
 
     /**
@@ -557,20 +501,7 @@ public class JSheet extends JDialog {
      * parameters passed into the fire method.
      */
     protected void fireOptionSelected(URIChooser pane, int option) {
-        SheetEvent sheetEvent = null;
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == SheetListener.class) {
-                // Lazily create the event:
-                if (sheetEvent == null) {
-                    sheetEvent = new SheetEvent(this, pane, option, null);
-                }
-                ((SheetListener) listeners[i + 1]).optionSelected(sheetEvent);
-            }
-        }
+        jSheetProduct2.getJSheetProduct().fireOptionSelected(pane, option, this);
     }
 
     /**
@@ -581,7 +512,7 @@ public class JSheet extends JDialog {
      * @param listener The listener for SheetEvents.
      */
     public static void showSheet(JOptionPane pane, Component parentComponent, SheetListener listener) {
-        final JSheet sheet = createSheet(pane, parentComponent, styleFromMessageType(pane.getMessageType()));
+        final JSheet sheet = JSheetProduct2.createSheet(pane, parentComponent, styleFromMessageType(pane.getMessageType()));
         sheet.addSheetListener(listener);
         sheet.show();
     }
@@ -771,7 +702,7 @@ public class JSheet extends JDialog {
         pane.setComponentOrientation(((parentComponent == null) ? JOptionPane.getRootFrame() : parentComponent).getComponentOrientation());
 
         int style = styleFromMessageType(messageType);
-        JSheet sheet = createSheet(pane, parentComponent, style);
+        JSheet sheet = JSheetProduct2.createSheet(pane, parentComponent, style);
 
         pane.selectInitialValue();
 
@@ -939,7 +870,7 @@ public class JSheet extends JDialog {
         pane.setComponentOrientation(((parentComponent == null) ? JOptionPane.getRootFrame() : parentComponent).getComponentOrientation());
 
         int style = styleFromMessageType(messageType);
-        JSheet sheet = createSheet(pane, parentComponent, style);
+        JSheet sheet = JSheetProduct2.createSheet(pane, parentComponent, style);
         pane.selectInitialValue();
         sheet.addSheetListener(listener);
         sheet.show();
@@ -962,92 +893,6 @@ public class JSheet extends JDialog {
         }
     }
 
-    private static JSheet createSheet(final JOptionPane pane, Component parent,
-            int style) {
-        // If the parent is on a popup menu retrieve its invoker
-        JPopupMenu popup = parent instanceof JPopupMenu ? (JPopupMenu) parent
-                : (JPopupMenu) SwingUtilities.getAncestorOfClass(JPopupMenu.class, parent);
-        if (popup != null) {
-            parent = popup.getInvoker();
-        }
-
-        Window window = getWindowForComponent(parent);
-        final JSheet sheet;
-        boolean isUndecorated;
-        if (window instanceof Frame) {
-            isUndecorated = ((Frame) window).isUndecorated();
-            sheet = new JSheet((Frame) window);
-        } else {
-            isUndecorated = ((Dialog) window).isUndecorated();
-            sheet = new JSheet((Dialog) window);
-        }
-
-        JComponent contentPane = (JComponent) sheet.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-
-        if (isNativeSheetSupported() && !isUndecorated) {
-            contentPane.setBorder(new EmptyBorder(12, 0, 0, 0));
-        }
-
-        contentPane.add(pane, BorderLayout.CENTER);
-        sheet.setResizable(false);
-        sheet.addWindowListener(new WindowAdapter() {
-            private boolean gotFocus = false;
-
-            @Override
-            public void windowClosing(WindowEvent we) {
-                pane.setValue(null);
-            }
-
-            @Override
-            public void windowClosed(WindowEvent we) {
-                if (pane.getValue() == JOptionPane.UNINITIALIZED_VALUE) {
-                    sheet.fireOptionSelected(pane);
-                }
-            }
-
-            @Override
-            public void windowGainedFocus(WindowEvent we) {
-                // Once window gets focus, set initial focus
-                if (!gotFocus) {
-                    //Ugly dirty hack: JOptionPane.selectInitialValue() is protected.
-                    //So we call directly into the UI. This may cause mayhem,
-                    //because we override the encapsulation.
-                    //pane.selectInitialValue();
-                    OptionPaneUI ui = pane.getUI();
-                    if (ui != null) {
-                        ui.selectInitialValue(pane);
-                    }
-                    gotFocus = true;
-                }
-            }
-        });
-        sheet.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent ce) {
-                // reset value to ensure closing works properly
-                pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-            }
-        });
-        pane.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                // Let the defaultCloseOperation handle the closing
-                // if the user closed the window without selecting a button
-                // (newValue = null in that case).  Otherwise, close the sheet.
-                if (sheet.isVisible() && event.getSource() == pane
-                        && (event.getPropertyName().equals(JOptionPane.VALUE_PROPERTY))
-                        && event.getNewValue() != null
-                        && event.getNewValue() != JOptionPane.UNINITIALIZED_VALUE) {
-                    sheet.setVisible(false);
-                    sheet.fireOptionSelected(pane);
-                }
-            }
-        });
-        sheet.pack();
-        return sheet;
-    }
-
     /**
      * Returns the specified component's toplevel
      * <code>Frame</code> or
@@ -1059,7 +904,7 @@ public class JSheet extends JDialog {
      * component, or the default frame if the component is <code>null</code>, or
      * does not have a valid <code>Frame</code> or <code>Dialog</code> parent
      */
-    static Window getWindowForComponent(Component parentComponent) {
+    public static Window getWindowForComponent(Component parentComponent) {
         if (parentComponent == null) {
             return JOptionPane.getRootFrame();
         }

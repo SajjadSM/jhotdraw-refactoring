@@ -36,7 +36,8 @@ import org.jhotdraw.util.ResourceBundleUtil;
  */
 public class JActivityView extends javax.swing.JPanel {
 
-    public final static String REQUEST_REMOVE_PROPERTY = "requestRemove";
+    private JActivityViewProduct jActivityViewProduct = new JActivityViewProduct();
+	public final static String REQUEST_REMOVE_PROPERTY = "requestRemove";
     @Nullable private ActivityModel model;
 
     private class Handler implements PropertyChangeListener, ChangeListener {
@@ -100,9 +101,9 @@ public class JActivityView extends javax.swing.JPanel {
 
     private void updateProperties(@Nullable PropertyChangeEvent evt) {
         if (evt == null || evt.getPropertyName() == null) {
-            updateNote();
-            updateWarning();
-            updateError();
+            jActivityViewProduct.updateNote(this.model);
+            jActivityViewProduct.updateWarning(this.model, this);
+            jActivityViewProduct.updateError(this.model, this);
             updateCancelable();
             updateCanceled();
             updateClosed();
@@ -111,11 +112,11 @@ public class JActivityView extends javax.swing.JPanel {
         }
         String name = evt.getPropertyName();
         if (name == ActivityModel.NOTE_PROPERTY) {
-            updateNote();
+            jActivityViewProduct.updateNote(this.model);
         } else if (name == ActivityModel.WARNING_PROPERTY) {
-            updateWarning();
+            jActivityViewProduct.updateWarning(this.model, this);
         } else if (name == ActivityModel.ERROR_PROPERTY) {
-            updateError();
+            jActivityViewProduct.updateError(this.model, this);
         } else if (name == ActivityModel.CANCELABLE_PROPERTY) {
             updateCancelable();
         } else if (name == ActivityModel.CANCELED_PROPERTY) {
@@ -134,35 +135,8 @@ public class JActivityView extends javax.swing.JPanel {
         titleLabel.setText(model.getTitle());
     }
 
-    private void updateNote() {
-        String txt = model.getNote();
-        noteLabel.setText(model.getNote());
-    }
-
     private void updateIndeterminate() {
         progressBar.setIndeterminate(model.isIndeterminate());
-    }
-
-    private void updateWarning() {
-        String txt = model.getWarning();
-        warningLabel.setText(txt);
-        updateLabelVisibility();
-    }
-
-    private void updateError() {
-        String txt = model.getError();
-        errorLabel.setText(txt);
-        updateLabelVisibility();
-    }
-
-    private void updateLabelVisibility() {
-        boolean isError = model.getError() != null;
-        boolean isWarning = model.getWarning() != null;
-
-        errorLabel.setVisible(isError);
-        warningLabel.setVisible(!isError && isWarning);
-        noteLabel.setVisible(!isError && !isWarning);
-        revalidate();
     }
 
     private void updateCancelable() {
@@ -200,9 +174,9 @@ public class JActivityView extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         titleLabel = new javax.swing.JLabel();
-        noteLabel = new javax.swing.JLabel();
-        warningLabel = new javax.swing.JLabel();
-        errorLabel = new javax.swing.JLabel();
+        jActivityViewProduct.setNoteLabel(new javax.swing.JLabel());
+        jActivityViewProduct.setWarningLabel(new javax.swing.JLabel());
+        jActivityViewProduct.setErrorLabel(new javax.swing.JLabel());
         progressBar = new javax.swing.JProgressBar();
         cancelButton = new javax.swing.JButton();
         closeButton = new javax.swing.JButton();
@@ -220,35 +194,35 @@ public class JActivityView extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 12);
         add(titleLabel, gridBagConstraints);
 
-        noteLabel.setFont(noteLabel.getFont().deriveFont(noteLabel.getFont().getSize()-2f));
-        noteLabel.setText("note");
+        jActivityViewProduct.getNoteLabel().setFont(jActivityViewProduct.getNoteLabel().getFont().deriveFont(jActivityViewProduct.getNoteLabel().getFont().getSize()-2f));
+        jActivityViewProduct.getNoteLabel().setText("note");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 12, 0, 12);
-        add(noteLabel, gridBagConstraints);
+        add(jActivityViewProduct.getNoteLabel(), gridBagConstraints);
 
-        warningLabel.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
-        warningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/jhotdraw/gui/images/ProgressView.warningIcon.png"))); // NOI18N
-        warningLabel.setText("warning");
+        jActivityViewProduct.getWarningLabel().setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
+        jActivityViewProduct.getWarningLabel().setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/jhotdraw/gui/images/ProgressView.warningIcon.png"))); // NOI18N
+        jActivityViewProduct.getWarningLabel().setText("warning");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 12, 0, 12);
-        add(warningLabel, gridBagConstraints);
+        add(jActivityViewProduct.getWarningLabel(), gridBagConstraints);
 
-        errorLabel.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
-        errorLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/jhotdraw/gui/images/ProgressView.errorIcon.png"))); // NOI18N
-        errorLabel.setText("error");
+        jActivityViewProduct.getErrorLabel().setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
+        jActivityViewProduct.getErrorLabel().setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/jhotdraw/gui/images/ProgressView.errorIcon.png"))); // NOI18N
+        jActivityViewProduct.getErrorLabel().setText("error");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 12, 0, 12);
-        add(errorLabel, gridBagConstraints);
+        add(jActivityViewProduct.getErrorLabel(), gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -306,11 +280,7 @@ public class JActivityView extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton closeButton;
-    private javax.swing.JLabel errorLabel;
-    private javax.swing.JLabel noteLabel;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JSeparator separator;
     private javax.swing.JLabel titleLabel;
-    private javax.swing.JLabel warningLabel;
-    // End of variables declaration//GEN-END:variables
 }

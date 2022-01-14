@@ -40,7 +40,8 @@ import javax.swing.plaf.*;
  */
 public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
 
-    private final static boolean isFloatingAllowed = false;
+    private PaletteToolBarUIProduct paletteToolBarUIProduct = new PaletteToolBarUIProduct();
+	private final static boolean isFloatingAllowed = false;
     protected JToolBar toolBar;
     private boolean floating;
     private int floatingX;
@@ -83,12 +84,10 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
     public final static String TOOLBAR_TEXT_ICON_GAP_PROPERTY = "Palette.ToolBar.textIconGap";
     /* The value of this client property must be an Insets object or null, if it is null, the insets of the toolbar border are used */
     public final static String TOOLBAR_INSETS_OVERRIDE_PROPERTY = "Palette.ToolBar.insetsOverride";
-    private static Border rolloverBorder;
-    private static Border nonRolloverBorder;
-    private static Border nonRolloverToggleBorder;
+    public static Border rolloverBorder;
+    public static Border nonRolloverBorder;
+    public static Border nonRolloverToggleBorder;
     private boolean rolloverBorders = false;
-    private HashMap<AbstractButton, Border> borderTable = new HashMap<AbstractButton, Border>();
-    private Hashtable<AbstractButton, Boolean> rolloverTable = new Hashtable<AbstractButton, Boolean>();
     /**
      * As of Java 2 platform v1.3 this previously undocumented field is no
      * longer used.
@@ -231,7 +230,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
         dockingBorderColor = null;
         floatingBorderColor = null;
 
-        installNormalBorders(toolBar);
+        paletteToolBarUIProduct.installNormalBorders(toolBar);
 
         rolloverBorder = null;
         nonRolloverBorder = null;
@@ -574,9 +573,9 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
         rolloverBorders = rollover;
 
         if (rolloverBorders) {
-            installRolloverBorders(toolBar);
+            paletteToolBarUIProduct.installRolloverBorders(toolBar);
         } else {
-            installNonRolloverBorders(toolBar);
+            paletteToolBarUIProduct.installNonRolloverBorders(toolBar);
         }
     }
 
@@ -592,15 +591,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      */
     protected void installRolloverBorders(JComponent c) {
 
-        // Put rollover borders on buttons
-        Component[] components = c.getComponents();
-
-        for (int i = 0; i < components.length; ++i) {
-            if (components[i] instanceof JComponent) {
-                ((JComponent) components[i]).updateUI();
-                setBorderToRollover(components[i]);
-            }
-        }
+        paletteToolBarUIProduct.installRolloverBorders(c);
     }
 
     /**
@@ -616,15 +607,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      * @since 1.4
      */
     protected void installNonRolloverBorders(JComponent c) {
-        // Put non-rollover borders on buttons. These borders reduce the margin.
-        Component[] components = c.getComponents();
-
-        for (int i = 0; i < components.length; ++i) {
-            if (components[i] instanceof JComponent) {
-                ((JComponent) components[i]).updateUI();
-                setBorderToNonRollover(components[i]);
-            }
-        }
+        paletteToolBarUIProduct.installNonRolloverBorders(c);
     }
 
     /**
@@ -640,12 +623,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      * @since 1.4
      */
     protected void installNormalBorders(JComponent c) {
-        // Put back the normal borders on buttons
-        Component[] components = c.getComponents();
-
-        for (int i = 0; i < components.length; ++i) {
-            setBorderToNormal(components[i]);
-        }
+        paletteToolBarUIProduct.installNormalBorders(c);
     }
 
     /**
@@ -657,36 +635,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      * @since 1.4
      */
     protected void setBorderToRollover(Component c) {
-        if (true) {
-            return;
-        }
-        if (c instanceof AbstractButton) {
-            AbstractButton b = (AbstractButton) c;
-
-            Border border = (Border) borderTable.get(b);
-            if (border == null || border instanceof UIResource) {
-                borderTable.put(b, b.getBorder());
-            }
-
-            // Only set the border if its the default border
-            if (b.getBorder() instanceof UIResource) {
-                b.setBorder(getRolloverBorder(b));
-            }
-
-            rolloverTable.put(b, b.isRolloverEnabled() ? Boolean.TRUE : Boolean.FALSE);
-            b.setRolloverEnabled(true);
-        }
-    }
-
-    @Nullable
-    private Border getRolloverBorder(AbstractButton b) {
-        Object borderProvider = UIManager.get("ToolBar.rolloverBorderProvider");
-        if (borderProvider == null) {
-            return rolloverBorder;
-        }
-
-        //return ((BorderProvider) borderProvider).getRolloverBorder(b);
-        return null;
+        paletteToolBarUIProduct.setBorderToRollover(c);
     }
 
     /**
@@ -698,28 +647,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      * @since 1.4
      */
     protected void setBorderToNonRollover(Component c) {
-        if (true) {
-            return;
-        }
-        if (c instanceof AbstractButton) {
-            AbstractButton b = (AbstractButton) c;
-
-            Border border = (Border) borderTable.get(b);
-            if (border == null || border instanceof UIResource) {
-                borderTable.put(b, b.getBorder());
-            }
-
-            // Only set the border if its the default border
-            if (b.getBorder() instanceof UIResource) {
-                if (b instanceof JToggleButton) {
-                    ((JToggleButton) b).setBorder(nonRolloverToggleBorder);
-                } else {
-                    b.setBorder(nonRolloverBorder);
-                }
-            }
-            rolloverTable.put(b, b.isRolloverEnabled() ? Boolean.TRUE : Boolean.FALSE);
-            b.setRolloverEnabled(false);
-        }
+        paletteToolBarUIProduct.setBorderToNonRollover(c);
     }
 
     /**
@@ -732,20 +660,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
      * @since 1.4
      */
     protected void setBorderToNormal(Component c) {
-        if (true) {
-            return;
-        }
-        if (c instanceof AbstractButton) {
-            AbstractButton b = (AbstractButton) c;
-
-            Border border = (Border) borderTable.remove(b);
-            b.setBorder(border);
-
-            Boolean value = (Boolean) rolloverTable.remove(b);
-            if (value != null) {
-                b.setRolloverEnabled(value.booleanValue());
-            }
-        }
+        paletteToolBarUIProduct.setBorderToNormal(c);
     }
 
     public void setFloatingLocation(int x, int y) {
@@ -1108,9 +1023,9 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
             }
 
             if (isRolloverBorders()) {
-                setBorderToRollover(c);
+                paletteToolBarUIProduct.setBorderToRollover(c);
             } else {
-                setBorderToNonRollover(c);
+                paletteToolBarUIProduct.setBorderToNonRollover(c);
             }
         }
 
@@ -1123,7 +1038,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
             }
 
             // Revert the button border
-            setBorderToNormal(c);
+            paletteToolBarUIProduct.setBorderToNormal(c);
         }
 
         //
@@ -1247,7 +1162,7 @@ public class PaletteToolBarUI extends ToolBarUI implements SwingConstants {
                     }
                 }
             } else if (propertyName == IS_ROLLOVER) {
-                installNormalBorders(toolBar);
+                paletteToolBarUIProduct.installNormalBorders(toolBar);
                 setRolloverBorders(((Boolean) evt.getNewValue()).booleanValue());
             }
         }

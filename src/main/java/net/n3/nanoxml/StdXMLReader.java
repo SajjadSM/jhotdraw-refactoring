@@ -73,6 +73,22 @@ public class StdXMLReader
       URL systemId;
    
       String publicId;
+
+	public URL extractedFromOpenStream(String publicID, String systemID) throws MalformedURLException {
+		URL url = new URL(this.systemId, systemID);
+		if (url.getRef() != null) {
+			String ref = url.getRef();
+			if (url.getFile().length() > 0) {
+				url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+				url = new URL("jar:" + url + '!' + ref);
+			} else {
+				url = StdXMLReader.class.getResource(ref);
+			}
+		}
+		this.publicId = publicID;
+		this.systemId = url;
+		return url;
+	}
    
    }
 
@@ -474,7 +490,7 @@ public class StdXMLReader
              FileNotFoundException,
              IOException
    {
-      URL url = extractedFromOpenStream(publicID, systemID);
+      URL url = currentReader.extractedFromOpenStream(publicID, systemID);
 	StringBuffer charsRead = new StringBuffer();
       Reader reader = this.stream2reader(url.openStream(), charsRead);
 
@@ -494,24 +510,7 @@ public class StdXMLReader
    }
 
 
-private URL extractedFromOpenStream(String publicID, String systemID) throws MalformedURLException {
-	URL url = new URL(this.currentReader.systemId, systemID);
-	if (url.getRef() != null) {
-		String ref = url.getRef();
-		if (url.getFile().length() > 0) {
-			url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
-			url = new URL("jar:" + url + '!' + ref);
-		} else {
-			url = StdXMLReader.class.getResource(ref);
-		}
-	}
-	this.currentReader.publicId = publicID;
-	this.currentReader.systemId = url;
-	return url;
-}
-
-
-   /**
+/**
     * Starts a new stream from a Java reader. The new stream is used
     * temporary to read data from. If that stream is exhausted, control
     * returns to the parent stream.

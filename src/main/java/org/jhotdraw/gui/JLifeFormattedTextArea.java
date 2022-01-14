@@ -24,9 +24,8 @@ import javax.swing.text.Document;
  */
 public class JLifeFormattedTextArea extends JTextArea {
 
-    /** This adapter is used for adapting Formatters to the JTextArea. */
-    private JLifeFormattedTextField formattedTextFieldAdapter;
-    /**
+    private JLifeFormattedTextAreaProduct jLifeFormattedTextAreaProduct = new JLifeFormattedTextAreaProduct();
+	/**
      * Forwards property change events from the formattedTextFieldAdapter to
      * listeners of this object.
      */
@@ -44,35 +43,35 @@ public class JLifeFormattedTextArea extends JTextArea {
     }
 
 	private void formattedTextFieldAdapter(Document newValue) {
-		if (formattedTextFieldAdapter == null) {
-			formattedTextFieldAdapter = new JLifeFormattedTextField();
+		if (jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter() == null) {
+			jLifeFormattedTextAreaProduct.setFormattedTextFieldAdapter(new JLifeFormattedTextField());
 			handler = new PropertyChangeListener() {
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
-					if (evt.getSource() == formattedTextFieldAdapter && evt.getPropertyName() == "value") {
+					if (evt.getSource() == jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter() && evt.getPropertyName() == "value") {
 						firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
 					}
 				}
 			};
-			formattedTextFieldAdapter.addPropertyChangeListener(handler);
+			jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().addPropertyChangeListener(handler);
 		}
-		formattedTextFieldAdapter.setDocument(newValue);
+		jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().setDocument(newValue);
 	}
 
     public void setValue(Object value) {
-        formattedTextFieldAdapter.setValue(value);
+        jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().setValue(value);
     }
 
     public Object getValue() {
-        return formattedTextFieldAdapter.getValue();
+        return jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().getValue();
     }
 
     public void setFormatterFactory(JFormattedTextField.AbstractFormatterFactory newValue) {
-        formattedTextFieldAdapter.setFormatterFactory(newValue);
+        jLifeFormattedTextAreaProduct.setFormatterFactory(newValue);
     }
 
     public JFormattedTextField.AbstractFormatterFactory getFormatterFactory() {
-        return formattedTextFieldAdapter.getFormatterFactory();
+        return jLifeFormattedTextAreaProduct.getFormatterFactory();
     }
 
     /**
