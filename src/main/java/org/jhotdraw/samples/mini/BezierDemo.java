@@ -29,7 +29,9 @@ import org.jhotdraw.geom.*;
  */
 public class BezierDemo extends javax.swing.JPanel {
 
-    private static class Example {
+    private BezierDemoProduct bezierDemoProduct = new BezierDemoProduct();
+
+	private static class Example {
 
         double error;
         BezierPath digitized = new BezierPath();
@@ -51,7 +53,7 @@ public class BezierDemo extends javax.swing.JPanel {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            double zoomFactor = getZoomFactor();
+            double zoomFactor = bezierDemoProduct.getZoomFactor();
             example.digitized.lineTo(e.getX() / zoomFactor, e.getY() / zoomFactor);
             example.invalidate();
             canvas.repaint();
@@ -69,8 +71,8 @@ public class BezierDemo extends javax.swing.JPanel {
         public void mousePressed(MouseEvent e) {
             example = new Example();
             examples.add(example);
-            example.error = getError();
-            double zoomFactor = getZoomFactor();
+            example.error = bezierDemoProduct.getError();
+            double zoomFactor = bezierDemoProduct.getZoomFactor();
             example.digitized.moveTo(e.getX() / zoomFactor, e.getY() / zoomFactor);
             canvas.repaint();
         }
@@ -109,13 +111,13 @@ public class BezierDemo extends javax.swing.JPanel {
                     }
                     // Split into segments at corners
                     ex.segments = new ArrayList<ArrayList<Point2D.Double>>();
-                    ex.segments = Bezier.splitAtCorners(digitizedPoints, 77 / 180d * Math.PI, getError() * 2);
+                    ex.segments = Bezier.splitAtCorners(digitizedPoints, 77 / 180d * Math.PI, bezierDemoProduct.getError() * 2);
 
                     // Clean up the data in the segments
                     for (int i = 0, n = ex.segments.size(); i < n; i++) {
                         ArrayList<Point2D.Double> seg = ex.segments.get(i);
 
-                        seg = Bezier.removeClosePoints(seg, getError());
+                        seg = Bezier.removeClosePoints(seg, bezierDemoProduct.getError());
                         seg = Bezier.reduceNoise(seg, 0.8);
 
                         ex.segments.set(i, seg);
@@ -126,7 +128,7 @@ public class BezierDemo extends javax.swing.JPanel {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             AffineTransform identityTransform = g.getTransform();
             AffineTransform tx = g.getTransform();
-            double zoomFactor = getZoomFactor();
+            double zoomFactor = bezierDemoProduct.getZoomFactor();
             tx.scale(zoomFactor, zoomFactor);
             g.setTransform(tx);
 
@@ -268,21 +270,6 @@ public class BezierDemo extends javax.swing.JPanel {
         });
     }
 
-    private double getSquaredError() {
-        double error = getError();
-
-        return error * error;
-    }
-
-    private double getError() {
-        double error = 2d / getZoomFactor();
-        return error;
-    }
-
-    private double getZoomFactor() {
-        return zoomSlider.getValue() / 100d;
-    }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -295,7 +282,7 @@ public class BezierDemo extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         toleranceLabel = new javax.swing.JLabel();
-        zoomSlider = new javax.swing.JSlider();
+        bezierDemoProduct.setZoomSlider(new javax.swing.JSlider());
         showDigitizedCheck = new javax.swing.JCheckBox();
         showPreprocessedCheck = new javax.swing.JCheckBox();
         showPolylineCheck = new javax.swing.JCheckBox();
@@ -315,9 +302,9 @@ public class BezierDemo extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(toleranceLabel, gridBagConstraints);
 
-        zoomSlider.setMaximum(800);
-        zoomSlider.setMinimum(100);
-        zoomSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        bezierDemoProduct.getZoomSlider().setMaximum(800);
+        bezierDemoProduct.getZoomSlider().setMinimum(100);
+        bezierDemoProduct.getZoomSlider().addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 zoomChanged(evt);
             }
@@ -327,7 +314,7 @@ public class BezierDemo extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        jPanel1.add(zoomSlider, gridBagConstraints);
+        jPanel1.add(bezierDemoProduct.getZoomSlider(), gridBagConstraints);
 
         showDigitizedCheck.setText("Show Source Points");
         showDigitizedCheck.addActionListener(new java.awt.event.ActionListener() {
@@ -469,6 +456,4 @@ private void checkboxPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:even
     private javax.swing.JCheckBox showPolylineCheck;
     private javax.swing.JCheckBox showPreprocessedCheck;
     private javax.swing.JLabel toleranceLabel;
-    private javax.swing.JSlider zoomSlider;
-    // End of variables declaration//GEN-END:variables
 }

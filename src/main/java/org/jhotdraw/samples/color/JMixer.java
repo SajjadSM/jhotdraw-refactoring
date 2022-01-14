@@ -29,7 +29,8 @@ import javax.swing.event.*;
  */
 public class JMixer extends javax.swing.JPanel {
 
-    private JList swatchesList;
+    private JMixerProduct jMixerProduct = new JMixerProduct();
+	private JList swatchesList;
     private DefaultColorSliderModel sliderModel;
     private int adjusting;
 
@@ -84,7 +85,7 @@ public class JMixer extends javax.swing.JPanel {
         presetCombo.setModel(presets);
 
         Font smallFont = new Font("Lucida Grande", Font.PLAIN, 11);
-        for (Component c : mixerPanel.getComponents()) {
+        for (Component c : jMixerProduct.getMixerPanel().getComponents()) {
             c.setFont(smallFont);
         }
 
@@ -268,11 +269,11 @@ public class JMixer extends javax.swing.JPanel {
         hueGroup = new javax.swing.ButtonGroup();
         sysGroup = new javax.swing.ButtonGroup();
         scrollPane = new javax.swing.JScrollPane();
-        disclosureButton = new javax.swing.JToggleButton();
+        jMixerProduct.setDisclosureButton(new javax.swing.JToggleButton());
         sysRGBToggle = new javax.swing.JToggleButton();
         sysRYBToggle = new javax.swing.JToggleButton();
         presetCombo = new javax.swing.JComboBox();
-        mixerPanel = new javax.swing.JPanel();
+        jMixerProduct.setMixerPanel(new javax.swing.JPanel());
         harmonicWheel = new org.jhotdraw.color.JHarmonicColorWheel();
         customHueRadio = new javax.swing.JRadioButton();
         customHueLabel = new javax.swing.JLabel();
@@ -321,14 +322,14 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.5;
         add(scrollPane, gridBagConstraints);
 
-        disclosureButton.setSelected(true);
-        disclosureButton.setText("Show Mixer");
-        disclosureButton.addActionListener(new java.awt.event.ActionListener() {
+        jMixerProduct.getDisclosureButton().setSelected(true);
+        jMixerProduct.getDisclosureButton().setText("Show Mixer");
+        jMixerProduct.getDisclosureButton().addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mixerDisclosurePerformed(evt);
+                jMixerProduct.mixerDisclosurePerformed(evt);
             }
         });
-        add(disclosureButton, new java.awt.GridBagConstraints());
+        add(jMixerProduct.getDisclosureButton(), new java.awt.GridBagConstraints());
 
         sysGroup.add(sysRGBToggle);
         sysRGBToggle.setSelected(true);
@@ -364,7 +365,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         add(presetCombo, gridBagConstraints);
 
-        mixerPanel.setLayout(new java.awt.GridBagLayout());
+        jMixerProduct.getMixerPanel().setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -372,7 +373,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        mixerPanel.add(harmonicWheel, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(harmonicWheel, gridBagConstraints);
 
         hueGroup.add(customHueRadio);
         customHueRadio.setText("Custom");
@@ -384,13 +385,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(customHueRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(customHueRadio, gridBagConstraints);
 
         customHueLabel.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(customHueLabel, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(customHueLabel, gridBagConstraints);
 
         customHueField.setColumns(3);
         customHueField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -398,7 +399,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(customHueField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(customHueField, gridBagConstraints);
 
         customHueLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         customHueLabel2.setText("°");
@@ -406,7 +407,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(customHueLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(customHueLabel2, gridBagConstraints);
 
         hueGroup.add(analogousRadio);
         analogousRadio.setSelected(true);
@@ -419,13 +420,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(analogousRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(analogousRadio, gridBagConstraints);
 
         analogousLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(analogousLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(analogousLabel1, gridBagConstraints);
 
         analogousField.setColumns(3);
         analogousField.setEditable(false);
@@ -434,7 +435,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(analogousField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(analogousField, gridBagConstraints);
 
         analogousLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         analogousLabel2.setText("°");
@@ -442,7 +443,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(analogousLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(analogousLabel2, gridBagConstraints);
 
         hueGroup.add(primaryRadio);
         primaryRadio.setText("Primary");
@@ -454,13 +455,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(primaryRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(primaryRadio, gridBagConstraints);
 
         primaryLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(primaryLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(primaryLabel1, gridBagConstraints);
 
         primaryField.setColumns(3);
         primaryField.setEditable(false);
@@ -469,7 +470,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(primaryField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(primaryField, gridBagConstraints);
 
         primaryLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         primaryLabel2.setText("°");
@@ -477,7 +478,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(primaryLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(primaryLabel2, gridBagConstraints);
 
         hueGroup.add(clashRadio);
         clashRadio.setText("Clash");
@@ -489,13 +490,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(clashRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(clashRadio, gridBagConstraints);
 
         clashLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(clashLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(clashLabel1, gridBagConstraints);
 
         clashField.setColumns(3);
         clashField.setEditable(false);
@@ -504,7 +505,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(clashField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(clashField, gridBagConstraints);
 
         clashLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         clashLabel2.setText("°");
@@ -512,7 +513,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(clashLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(clashLabel2, gridBagConstraints);
 
         hueGroup.add(triadRadio);
         triadRadio.setText("Triad");
@@ -524,13 +525,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(triadRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(triadRadio, gridBagConstraints);
 
         triadLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(triadLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(triadLabel1, gridBagConstraints);
 
         triadField.setColumns(3);
         triadField.setEditable(false);
@@ -539,7 +540,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(triadField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(triadField, gridBagConstraints);
 
         triadLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         triadLabel2.setText("°");
@@ -547,7 +548,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(triadLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(triadLabel2, gridBagConstraints);
 
         hueGroup.add(splitComplementaryRadio);
         splitComplementaryRadio.setText("Split Complementary");
@@ -559,13 +560,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(splitComplementaryRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(splitComplementaryRadio, gridBagConstraints);
 
         splitComplementaryLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(splitComplementaryLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(splitComplementaryLabel1, gridBagConstraints);
 
         splitField.setColumns(3);
         splitField.setEditable(false);
@@ -574,7 +575,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(splitField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(splitField, gridBagConstraints);
 
         splitComplementaryLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         splitComplementaryLabel2.setText("°");
@@ -582,7 +583,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(splitComplementaryLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(splitComplementaryLabel2, gridBagConstraints);
 
         hueGroup.add(complementaryRadio);
         complementaryRadio.setText("Complementary");
@@ -594,13 +595,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(complementaryRadio, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(complementaryRadio, gridBagConstraints);
 
         complementaryLabel1.setText("+");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(complementaryLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(complementaryLabel1, gridBagConstraints);
 
         complementaryField.setColumns(3);
         complementaryField.setEditable(false);
@@ -609,7 +610,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(complementaryField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(complementaryField, gridBagConstraints);
 
         complementaryLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         complementaryLabel2.setText("°");
@@ -617,7 +618,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(complementaryLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(complementaryLabel2, gridBagConstraints);
 
         achromaticCheck.setText("Achromatic");
         achromaticCheck.addActionListener(new java.awt.event.ActionListener() {
@@ -628,13 +629,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(achromaticCheck, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(achromaticCheck, gridBagConstraints);
 
         achromaticLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(achromaticLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(achromaticLabel1, gridBagConstraints);
 
         achromaticField.setColumns(3);
         achromaticField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -642,7 +643,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(achromaticField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(achromaticField, gridBagConstraints);
 
         achromaticLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         achromaticLabel2.setText("%");
@@ -650,7 +651,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(achromaticLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(achromaticLabel2, gridBagConstraints);
 
         monochromaticCheck.setSelected(true);
         monochromaticCheck.setText("Monochromatic");
@@ -662,13 +663,13 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(monochromaticCheck, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(monochromaticCheck, gridBagConstraints);
 
         monochromaticLabel1.setText("±");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(monochromaticLabel1, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(monochromaticLabel1, gridBagConstraints);
 
         monochromaticField.setColumns(3);
         monochromaticField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -676,7 +677,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(monochromaticField, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(monochromaticField, gridBagConstraints);
 
         monochromaticLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         monochromaticLabel2.setText("%");
@@ -684,7 +685,7 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        mixerPanel.add(monochromaticLabel2, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(monochromaticLabel2, gridBagConstraints);
 
         saturationSlider.setOrientation(javax.swing.JSlider.VERTICAL);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -692,27 +693,21 @@ public class JMixer extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        mixerPanel.add(saturationSlider, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(saturationSlider, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.weighty = 1.0;
-        mixerPanel.add(springPanel, gridBagConstraints);
+        jMixerProduct.getMixerPanel().add(springPanel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.5;
-        add(mixerPanel, gridBagConstraints);
+        add(jMixerProduct.getMixerPanel(), gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     private void ruleChangePerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleChangePerformed
         updateRules();
 }//GEN-LAST:event_ruleChangePerformed
-
-private void mixerDisclosurePerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mixerDisclosurePerformed
-    mixerPanel.setVisible(disclosureButton.isSelected());
-    mixerPanel.getParent().validate();
-
-}//GEN-LAST:event_mixerDisclosurePerformed
 
 private void systemChangePerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_systemChangePerformed
     HarmonicColorModel m = harmonicWheel.getHarmonicColorModel();
@@ -759,10 +754,8 @@ private void presetPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel customHueLabel;
     private javax.swing.JLabel customHueLabel2;
     private javax.swing.JRadioButton customHueRadio;
-    private javax.swing.JToggleButton disclosureButton;
     private org.jhotdraw.color.JHarmonicColorWheel harmonicWheel;
     private javax.swing.ButtonGroup hueGroup;
-    private javax.swing.JPanel mixerPanel;
     private javax.swing.JCheckBox monochromaticCheck;
     private org.jhotdraw.gui.JLifeFormattedTextField monochromaticField;
     private javax.swing.JLabel monochromaticLabel1;

@@ -29,7 +29,9 @@ import java.util.Vector;
 
 public class StreamPosTokenizer
         /*extends StreamTokenizer*/ {
-    @Nullable private Reader reader = null;
+    private StreamPosTokenizerProduct streamPosTokenizerProduct = new StreamPosTokenizerProduct();
+
+	@Nullable private Reader reader = null;
     
     /**
      * Position of the next character that will be read from the file.
@@ -69,9 +71,6 @@ public class StreamPosTokenizer
     
     // rlw
     private char[] slashSlash = new char[] {'/','/'};
-    private char[] slashStar = new char[] {'/','*'};
-    private char[] starSlash = new char[] {'*','/'};
-    
     private byte ctype[] = new byte[256];
     private static final byte CT_WHITESPACE = 1;
     private static final byte CT_DIGIT = 2;
@@ -858,11 +857,11 @@ public class StreamPosTokenizer
         }*/
         
         if (slashSlashCommentsP && c == slashSlash[0]
-                || slashStarCommentsP && c == slashStar[0]) {
-            if (c == slashStar[0] && slashStar.length == 1) {
+                || slashStarCommentsP && c == streamPosTokenizerProduct.getSlashStar()[0]) {
+            if (c == streamPosTokenizerProduct.getSlashStar()[0] && streamPosTokenizerProduct.getSlashStar().length == 1) {
                 // This is the scanner code if the slashStar token
                 // is one characters long
-                while ((c = read()) != starSlash[0]) {
+                while ((c = read()) != streamPosTokenizerProduct.getStarSlash()[0]) {
                     if (c == '\r') {
                         lineno++;
                         c = read();
@@ -891,9 +890,9 @@ public class StreamPosTokenizer
                 // This is the scanner code if the slashStar and the slashSlash
                 // tokens are two characters long
                 c = read();
-                if (c == slashStar[1] && slashStarCommentsP) {
+                if (c == streamPosTokenizerProduct.getSlashStar()[1] && slashStarCommentsP) {
                     int prevc = 0;
-                    while ((c = read()) != starSlash[1] || prevc != starSlash[0]) {
+                    while ((c = read()) != streamPosTokenizerProduct.getStarSlash()[1] || prevc != streamPosTokenizerProduct.getStarSlash()[0]) {
                         if (c == '\r') {
                             lineno++;
                             c = read();
@@ -982,15 +981,7 @@ public class StreamPosTokenizer
      * or 2.
      */
     public void setSlashStarTokens(String slashStar, String starSlash) {
-        if (slashStar.length() != starSlash.length()) {
-            throw new IllegalArgumentException("SlashStar and StarSlash tokens must be of same length: '"+slashStar+"' '"+starSlash+"'");
-        }
-        if (slashStar.length() < 1 || slashStar.length() > 2) {
-            throw new IllegalArgumentException("SlashStar and StarSlash tokens must be of length 1 or 2: '"+slashStar+"' '"+starSlash+"'");
-        }
-        this.slashStar = slashStar.toCharArray();
-        this.starSlash = starSlash.toCharArray();
-        commentChar(this.slashStar[0]);
+        streamPosTokenizerProduct.setSlashStarTokens(slashStar, starSlash, this);
     }
     /**
      * Sets the slash slash token.

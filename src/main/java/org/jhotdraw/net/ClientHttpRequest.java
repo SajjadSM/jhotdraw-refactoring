@@ -28,39 +28,29 @@ import java.util.Iterator;
 
 public class ClientHttpRequest {
 
-    URLConnection connection;
-    @Nullable
-    OutputStream os = null;
-    Map<String, String> cookies = new HashMap<String, String>();
+    private ClientHttpRequestProduct clientHttpRequestProduct = new ClientHttpRequestProduct();
+	Map<String, String> cookies = new HashMap<String, String>();
     String rawCookies = "";
 
     protected void connect() throws IOException {
-        if (os == null) {
-            os = connection.getOutputStream();
-        }
+        clientHttpRequestProduct.connect();
     }
 
     protected void write(char c) throws IOException {
-        connect();
-        os.write(c);
+        clientHttpRequestProduct.write(c);
     }
 
     protected void write(String s) throws IOException {
-        connect();
-        // BEGIN PATCH W. Randelshofer 2008-05-23 use UTF-8
-        os.write(s.getBytes("UTF-8"));
-        // END PATCH W. Randelshofer 2008-05-23 use UTF-8
+        
+clientHttpRequestProduct.write(s);
     }
 
     protected void newline() throws IOException {
-        connect();
-        write("\r\n");
+        clientHttpRequestProduct.newline();
     }
 
     protected void writeln(String s) throws IOException {
-        connect();
-        write(s);
-        newline();
+        clientHttpRequestProduct.writeln(s);
     }
     private static Random random = new Random();
 
@@ -70,8 +60,8 @@ public class ClientHttpRequest {
     String boundary = "---------------------------" + randomString() + randomString() + randomString();
 
     private void boundary() throws IOException {
-        write("--");
-        write(boundary);
+        clientHttpRequestProduct.write("--");
+        clientHttpRequestProduct.write(boundary);
     }
 
     /**
@@ -81,7 +71,7 @@ public class ClientHttpRequest {
      * @throws IOException
      */
     public ClientHttpRequest(URLConnection connection) throws IOException {
-        this.connection = connection;
+        clientHttpRequestProduct.setConnection(connection);
         connection.setDoOutput(true);
         connection.setDoInput(true);
         connection.setRequestProperty("Content-Type",
@@ -120,7 +110,7 @@ public class ClientHttpRequest {
             }
         }
         if (cookieList.length() > 0) {
-            connection.setRequestProperty("Cookie", cookieList.toString());
+            clientHttpRequestProduct.getConnection().setRequestProperty("Cookie", cookieList.toString());
         }
     }
 
@@ -171,10 +161,10 @@ public class ClientHttpRequest {
     }
 
     private void writeName(String name) throws IOException {
-        newline();
-        write("Content-Disposition: form-data; name=\"");
-        write(name);
-        write('"');
+        clientHttpRequestProduct.newline();
+        clientHttpRequestProduct.write("Content-Disposition: form-data; name=\"");
+        clientHttpRequestProduct.write(name);
+        clientHttpRequestProduct.write('"');
     }
 
     /**
@@ -192,9 +182,9 @@ public class ClientHttpRequest {
         }
         boundary();
         writeName(name);
-        newline();
-        newline();
-        writeln(value);
+        clientHttpRequestProduct.newline();
+        clientHttpRequestProduct.newline();
+        clientHttpRequestProduct.writeln(value);
     }
 
     private static void pipe(InputStream in, OutputStream out) throws IOException {
@@ -222,19 +212,19 @@ public class ClientHttpRequest {
     public void setParameter(String name, String filename, InputStream is) throws IOException {
         boundary();
         writeName(name);
-        write("; filename=\"");
-        write(filename);
-        write('"');
-        newline();
-        write("Content-Type: ");
+        clientHttpRequestProduct.write("; filename=\"");
+        clientHttpRequestProduct.write(filename);
+        clientHttpRequestProduct.write('"');
+        clientHttpRequestProduct.newline();
+        clientHttpRequestProduct.write("Content-Type: ");
         String type = URLConnection.guessContentTypeFromName(filename);
         if (type == null) {
             type = "application/octet-stream";
         }
-        writeln(type);
-        newline();
-        pipe(is, os);
-        newline();
+        clientHttpRequestProduct.writeln(type);
+        clientHttpRequestProduct.newline();
+        pipe(is, clientHttpRequestProduct.getOs());
+        clientHttpRequestProduct.newline();
     }
 
     /**
@@ -300,10 +290,10 @@ public class ClientHttpRequest {
      */
     private InputStream doPost() throws IOException {
         boundary();
-        writeln("--");
-        os.close();
+        clientHttpRequestProduct.writeln("--");
+        clientHttpRequestProduct.getOs().close();
 
-        return connection.getInputStream();
+        return clientHttpRequestProduct.getConnection().getInputStream();
     }
 
     /**

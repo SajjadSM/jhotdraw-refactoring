@@ -63,7 +63,8 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
  */
 public class SVGDrawingPanel extends JPanel implements Disposable {
 
-    private UndoRedoManager undoManager;
+    private transient SVGDrawingPanelProduct sVGDrawingPanelProduct = new SVGDrawingPanelProduct();
+	private UndoRedoManager undoManager;
     @Nullable private DrawingEditor editor;
     private ResourceBundleUtil labels;
     private Preferences prefs;
@@ -122,7 +123,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
 
         undoManager = new UndoRedoManager();
 
-        Drawing drawing = createDrawing();
+        Drawing drawing = sVGDrawingPanelProduct.createDrawing();
         view.setDrawing(drawing);
         drawing.addUndoableEditListener(undoManager);
 
@@ -206,24 +207,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * {@code SVGDrawingPanel}.
      */
     public Drawing createDrawing() {
-        Drawing drawing = new QuadTreeDrawing();
-        LinkedList<InputFormat> inputFormats = new LinkedList<InputFormat>();
-        inputFormats.add(new SVGZInputFormat());
-        inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "PNG", "Portable Network Graphics (PNG)", "png", "image/png"));
-        inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "JPG", "Joint Photographics Experts Group (JPEG)", "jpg","image/jpg"));
-        inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "GIF", "Graphics Interchange Format (GIF)", "gif", "image/gif"));
-        inputFormats.add(new TextInputFormat(new SVGTextFigure()));
-        drawing.setInputFormats(inputFormats);
-        LinkedList<OutputFormat> outputFormats = new LinkedList<OutputFormat>();
-        outputFormats.add(new SVGOutputFormat());
-        outputFormats.add(new SVGZOutputFormat());
-        outputFormats.add(new ImageOutputFormat());
-        outputFormats.add(new ImageOutputFormat("JPG", "Joint Photographics Experts Group (JPEG)", "jpg", BufferedImage.TYPE_INT_RGB));
-        outputFormats.add(new ImageOutputFormat("BMP", "Windows Bitmap (BMP)", "bmp", BufferedImage.TYPE_BYTE_INDEXED));
-        outputFormats.add(new ImageMapOutputFormat());
-        drawing.setOutputFormats(outputFormats);
-
-        return drawing;
+        return sVGDrawingPanelProduct.createDrawing();
     }
 
     public void setDrawing(Drawing d) {
@@ -285,53 +269,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * interface, until the drawing is read.
      */
     public void read(URI f) throws IOException {
-        // Create a new drawing object
-        Drawing newDrawing = createDrawing();
-        if (newDrawing.getInputFormats().size() == 0) {
-            throw new InternalError("Drawing object has no input formats.");
-        }
-
-        // Try out all input formats until we succeed
-        IOException firstIOException = null;
-        for (InputFormat format : newDrawing.getInputFormats()) {
-            try {
-                format.read(f, newDrawing);
-                final Drawing loadedDrawing = newDrawing;
-                Runnable r = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // Set the drawing on the Event Dispatcher Thread
-                        setDrawing(loadedDrawing);
-                    }
-                };
-                if (SwingUtilities.isEventDispatchThread()) {
-                    r.run();
-                } else {
-                    try {
-                        SwingUtilities.invokeAndWait(r);
-                    } catch (InterruptedException ex) {
-                        // suppress silently
-                    } catch (InvocationTargetException ex) {
-                        InternalError ie = new InternalError("Error setting drawing.");
-                        ie.initCause(ex);
-                        throw ie;
-                    }
-                }
-                // We get here if reading was successful.
-                // We can return since we are done.
-                return;
-                //
-            } catch (IOException e) {
-                // We get here if reading failed.
-                // We only preserve the exception of the first input format,
-                // because that's the one which is best suited for this drawing.
-                if (firstIOException == null) {
-                    firstIOException = e;
-                }
-            }
-        }
-        throw firstIOException;
+        sVGDrawingPanelProduct.read(f, this);
     }
 
     /**
@@ -343,40 +281,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * interface, until the drawing is read.
      */
     public void read(URI f, InputFormat format) throws IOException {
-        if (format == null) {
-            read(f);
-            return;
-        }
-
-        // Create a new drawing object
-        Drawing newDrawing = createDrawing();
-        if (newDrawing.getInputFormats().size() == 0) {
-            throw new InternalError("Drawing object has no input formats.");
-        }
-
-        format.read(f, newDrawing);
-        final Drawing loadedDrawing = newDrawing;
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                // Set the drawing on the Event Dispatcher Thread
-                setDrawing(loadedDrawing);
-            }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException ex) {
-                // suppress silently
-            } catch (InvocationTargetException ex) {
-                InternalError ie = new InternalError("Error setting drawing.");
-                ie.initCause(ex);
-                throw ie;
-            }
-        }
+        sVGDrawingPanelProduct.read(f, format, this);
     }
 
     /**
@@ -592,4 +497,15 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
     private org.jhotdraw.draw.DefaultDrawingView view;
     private org.jhotdraw.samples.svg.gui.ViewToolBar viewToolBar;
     // End of variables declaration//GEN-END:variables
+
+	private void readObject(java.io.ObjectInputStream stream)
+			throws java.io.IOException, java.lang.ClassNotFoundException {
+		stream.defaultReadObject();
+		this.sVGDrawingPanelProduct = (SVGDrawingPanelProduct) stream.readObject();
+	}
+
+	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(this.sVGDrawingPanelProduct);
+	}
 }

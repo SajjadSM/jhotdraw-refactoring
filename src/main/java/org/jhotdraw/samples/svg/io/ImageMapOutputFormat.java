@@ -38,23 +38,13 @@ import org.jhotdraw.util.*;
  */
 public class ImageMapOutputFormat implements OutputFormat {
 
-    /**
-     * The affine transformation for the output. This is used
-     * to create scaled image maps.
-     */
-    private AffineTransform drawingTransform = new AffineTransform();
-    private static boolean DEBUG = true;
+    private ImageMapOutputFormatProduct imageMapOutputFormatProduct = new ImageMapOutputFormatProduct();
+	private static boolean DEBUG = true;
     /**
      * Set this to true, if AREA elements with <code>nohref="true"</code>
      * shall e included in the image map.
      */
     private boolean isIncludeNohref = false;
-    /**
-     * Image dimension. We only include AREA elements which are within the
-     * image dimension.
-     */
-    private Rectangle bounds = new Rectangle(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
-
     /** Creates a new instance. */
     public ImageMapOutputFormat() {
     }
@@ -113,8 +103,11 @@ public class ImageMapOutputFormat implements OutputFormat {
     public void write(OutputStream out, java.util.List<Figure> figures,
             AffineTransform drawingTransform, Dimension imageSize) throws IOException {
 
-        this.drawingTransform = (drawingTransform == null) ? new AffineTransform() : drawingTransform;
-        this.bounds = (imageSize == null) ? new Rectangle(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE) : new Rectangle(0, 0, imageSize.width, imageSize.height);
+        imageMapOutputFormatProduct
+				.setDrawingTransform((drawingTransform == null) ? new AffineTransform() : drawingTransform);
+        imageMapOutputFormatProduct
+				.setBounds((imageSize == null) ? new Rectangle(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+						: new Rectangle(0, 0, imageSize.width, imageSize.height));
 
         XMLElement document = new XMLElement("map");
 
@@ -219,166 +212,16 @@ public class ImageMapOutputFormat implements OutputFormat {
         }
     }
 
-	/**
-     * Writes the <code>shape</code>, <code>coords</code>, <code>href</code>,
-     * <code>nohref</code> Attribute for the specified figure and ellipse.
-     *
-     * @return Returns true, if the circle is inside of the image bounds.
-     */
-    private boolean writeCircleAttributes(IXMLElement elem, SVGFigure f, Ellipse2D.Double ellipse) {
-        AffineTransform t = TRANSFORM.getClone(f);
-        if (t == null) {
-            t = drawingTransform;
-        } else {
-            t.preConcatenate(drawingTransform);
-        }
-
-        if ((t.getType() &
-                (AffineTransform.TYPE_UNIFORM_SCALE | AffineTransform.TYPE_TRANSLATION)) ==
-                t.getType() &&
-                ellipse.width == ellipse.height) {
-
-            Point2D.Double start = new Point2D.Double(ellipse.x, ellipse.y);
-            Point2D.Double end = new Point2D.Double(ellipse.x + ellipse.width, ellipse.y + ellipse.height);
-            t.transform(start, start);
-            t.transform(end, end);
-            ellipse.x = Math.min(start.x, end.x);
-            ellipse.y = Math.min(start.y, end.y);
-            ellipse.width = Math.abs(start.x - end.x);
-            ellipse.height = Math.abs(start.y - end.y);
-
-            elem.setAttribute("shape", "circle");
-            elem.setAttribute("coords",
-                    (int) (ellipse.x + ellipse.width / 2d) + "," +
-                    (int) (ellipse.y + ellipse.height / 2d) + "," +
-                    (int) (ellipse.width / 2d));
-            writeHrefAttribute(elem, f);
-            return bounds.intersects(ellipse.getBounds());
-        } else {
-            return writePolyAttributes(elem, f, (Shape) ellipse);
-        }
-    }
-
-    /**
-     * Writes the <code>shape</code>, <code>coords</code>, <code>href</code>,
-     * <code>nohref</code> Attribute for the specified figure and rectangle.
-     *
-     * @return Returns true, if the rect is inside of the image bounds.
-     */
-    private boolean writeRectAttributes(IXMLElement elem, SVGFigure f, Rectangle2D.Double rect) {
-        AffineTransform t = TRANSFORM.getClone(f);
-        if (t == null) {
-            t = drawingTransform;
-        } else {
-            t.preConcatenate(drawingTransform);
-        }
-
-        if ((t.getType() &
-                (AffineTransform.TYPE_UNIFORM_SCALE | AffineTransform.TYPE_TRANSLATION)) ==
-                t.getType()) {
-
-            Point2D.Double start = new Point2D.Double(rect.x, rect.y);
-            Point2D.Double end = new Point2D.Double(rect.x + rect.width, rect.y + rect.height);
-            t.transform(start, start);
-            t.transform(end, end);
-            Rectangle r = new Rectangle(
-                    (int) Math.min(start.x, end.x),
-                    (int) Math.min(start.y, end.y),
-                    (int) Math.abs(start.x - end.x),
-                    (int) Math.abs(start.y - end.y));
-
-            elem.setAttribute("shape", "rect");
-            elem.setAttribute("coords",
-                    r.x + "," +
-                    r.y + "," +
-                    (r.x + r.width) + "," +
-                    (r.y + r.height));
-            writeHrefAttribute(elem, f);
-            return bounds.intersects(r);
-        } else {
-            return writePolyAttributes(elem, f, (Shape) rect);
-        }
-    }
-
-    private void writeHrefAttribute(IXMLElement elem, SVGFigure f) {
-        String link = f.get(LINK);
-        if (link != null && link.trim().length() > 0) {
-            elem.setAttribute("href", link);
-            elem.setAttribute("title", link);
-            elem.setAttribute("alt", link);
-            String linkTarget = f.get(LINK_TARGET);
-            if (linkTarget != null && linkTarget.trim().length() > 0) {
-                elem.setAttribute("target", linkTarget);
-            }
-        } else {
-            elem.setAttribute("nohref", "true");
-        }
-    }
-
-    /**
-     * Writes the <code>shape</code>, <code>coords</code>, <code>href</code>,
-     * <code>nohref</code> Attribute for the specified figure and shape.
-     *
-     * @return Returns true, if the polygon is inside of the image bounds.
-     */
-    private boolean writePolyAttributes(IXMLElement elem, SVGFigure f, Shape shape) {
-        AffineTransform t = TRANSFORM.getClone(f);
-        if (t == null) {
-            t = drawingTransform;
-        } else {
-            t.preConcatenate(drawingTransform);
-        }
-
-        StringBuilder buf = new StringBuilder();
-        float[] coords = new float[6];
-        Path2D.Double path = new Path2D.Double();
-        for (PathIterator i = shape.getPathIterator(t, 1.5f);
-                !i.isDone(); i.next()) {
-            switch (i.currentSegment(coords)) {
-                case PathIterator.SEG_MOVETO:
-                    if (buf.length() != 0) {
-                        throw new IllegalArgumentException("Illegal shape " + shape);
-                    }
-                    if (buf.length() != 0) {
-                        buf.append(',');
-                    }
-                    buf.append((int) coords[0]);
-                    buf.append(',');
-                    buf.append((int) coords[1]);
-                    path.moveTo(coords[0], coords[1]);
-                    break;
-                case PathIterator.SEG_LINETO:
-                    if (buf.length() != 0) {
-                        buf.append(',');
-                    }
-                    buf.append((int) coords[0]);
-                    buf.append(',');
-                    buf.append((int) coords[1]);
-                    path.lineTo(coords[0], coords[1]);
-                    break;
-                case PathIterator.SEG_CLOSE:
-                    path.closePath();
-                    break;
-                default:
-                    throw new InternalError("Illegal segment type " + i.currentSegment(coords));
-            }
-        }
-        elem.setAttribute("shape", "poly");
-        elem.setAttribute("coords", buf.toString());
-        writeHrefAttribute(elem, f);
-        return path.intersects(new Rectangle2D.Float(bounds.x, bounds.y, bounds.width, bounds.height));
-    }
-
-    private void writePathElement(IXMLElement parent, SVGPathFigure f) throws IOException {
+	private void writePathElement(IXMLElement parent, SVGPathFigure f) throws IOException {
         GrowStroke growStroke = new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f));
         BasicStroke basicStroke = new BasicStroke((float) getStrokeTotalWidth(f));
         for (Figure child : f.getChildren()) {
             SVGBezierFigure bezier = (SVGBezierFigure) child;
             IXMLElement elem = parent.createElement("area");
             if (bezier.isClosed()) {
-                writePolyAttributes(elem, f, growStroke.createStrokedShape(bezier.getBezierPath()));
+                imageMapOutputFormatProduct.writePolyAttributes(elem, f, growStroke.createStrokedShape(bezier.getBezierPath()));
             } else {
-                writePolyAttributes(elem, f, basicStroke.createStrokedShape(bezier.getBezierPath()));
+                imageMapOutputFormatProduct.writePolyAttributes(elem, f, basicStroke.createStrokedShape(bezier.getBezierPath()));
             }
             parent.addChild(elem);
         }
@@ -386,7 +229,7 @@ public class ImageMapOutputFormat implements OutputFormat {
 
     private void writePolygonElement(IXMLElement parent, SVGPathFigure f) throws IOException {
         IXMLElement elem = parent.createElement("area");
-        if (writePolyAttributes(elem, f, new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f)).createStrokedShape(f.getChild(0).getBezierPath()))) {
+        if (imageMapOutputFormatProduct.writePolyAttributes(elem, f, new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f)).createStrokedShape(f.getChild(0).getBezierPath()))) {
             parent.addChild(elem);
         }
     }
@@ -394,14 +237,14 @@ public class ImageMapOutputFormat implements OutputFormat {
     private void writePolylineElement(IXMLElement parent, SVGPathFigure f) throws IOException {
         IXMLElement elem = parent.createElement("area");
 
-        if (writePolyAttributes(elem, f, new BasicStroke((float) getStrokeTotalWidth(f)).createStrokedShape(f.getChild(0).getBezierPath()))) {
+        if (imageMapOutputFormatProduct.writePolyAttributes(elem, f, new BasicStroke((float) getStrokeTotalWidth(f)).createStrokedShape(f.getChild(0).getBezierPath()))) {
             parent.addChild(elem);
         }
     }
 
     private void writeLineElement(IXMLElement parent, SVGPathFigure f) throws IOException {
         IXMLElement elem = parent.createElement("area");
-        if (writePolyAttributes(elem, f, new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f)).createStrokedShape(new Line2D.Double(
+        if (imageMapOutputFormatProduct.writePolyAttributes(elem, f, new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f)).createStrokedShape(new Line2D.Double(
                 f.getStartPoint(), f.getEndPoint())))) {
             parent.addChild(elem);
         }
@@ -417,9 +260,9 @@ public class ImageMapOutputFormat implements OutputFormat {
             rect.y -= grow;
             rect.width += grow;
             rect.height += grow;
-            isContained = writeRectAttributes(elem, f, rect);
+            isContained = imageMapOutputFormatProduct.writeRectAttributes(elem, f, rect);
         } else {
-            isContained = writePolyAttributes(elem, f,
+            isContained = imageMapOutputFormatProduct.writePolyAttributes(elem, f,
                     new GrowStroke( (getStrokeTotalWidth(f) / 2d),  getStrokeTotalWidth(f)).createStrokedShape(new RoundRectangle2D.Double(
                     f.getX(), f.getY(), f.getWidth(), f.getHeight(),
                     f.getArcWidth(), f.getArcHeight())));
@@ -437,7 +280,7 @@ public class ImageMapOutputFormat implements OutputFormat {
         rect.y -= grow;
         rect.width += grow;
         rect.height += grow;
-        if (writeRectAttributes(elem, f, rect)) {
+        if (imageMapOutputFormatProduct.writeRectAttributes(elem, f, rect)) {
             parent.addChild(elem);
         }
     }
@@ -450,7 +293,7 @@ public class ImageMapOutputFormat implements OutputFormat {
         rect.y -= grow;
         rect.width += grow;
         rect.height += grow;
-        if (writeRectAttributes(elem, f, rect)) {
+        if (imageMapOutputFormatProduct.writeRectAttributes(elem, f, rect)) {
             parent.addChild(elem);
         }
     }
@@ -460,7 +303,7 @@ public class ImageMapOutputFormat implements OutputFormat {
         Rectangle2D.Double r = f.getBounds();
         double grow = getPerpendicularHitGrowth(f);
         Ellipse2D.Double ellipse = new Ellipse2D.Double(r.x - grow, r.y - grow, r.width + grow, r.height + grow);
-        if (writeCircleAttributes(elem, f, ellipse)) {
+        if (imageMapOutputFormatProduct.writeCircleAttributes(elem, f, ellipse)) {
             parent.addChild(elem);
         }
     }
@@ -475,7 +318,7 @@ public class ImageMapOutputFormat implements OutputFormat {
     private void writeImageElement(IXMLElement parent, SVGImageFigure f) {
         IXMLElement elem = parent.createElement("area");
         Rectangle2D.Double rect = f.getBounds();
-        writeRectAttributes(elem, f, rect);
+        imageMapOutputFormatProduct.writeRectAttributes(elem, f, rect);
         parent.addChild(elem);
     }
 }

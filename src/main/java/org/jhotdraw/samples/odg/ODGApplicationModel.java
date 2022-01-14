@@ -47,7 +47,8 @@ import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
  */
 public class ODGApplicationModel extends DefaultApplicationModel {
 
-    private final static double[] scaleFactors = {5, 4, 3, 2, 1.5, 1.25, 1, 0.75, 0.5, 0.25, 0.10};
+    private transient ODGApplicationModelProduct oDGApplicationModelProduct = new ODGApplicationModelProduct();
+	private final static double[] scaleFactors = {5, 4, 3, 2, 1.5, 1.25, 1, 0.75, 0.5, 0.25, 0.10};
     /**
      * This editor is shared by all views.
      */
@@ -117,50 +118,6 @@ public class ODGApplicationModel extends DefaultApplicationModel {
     }
 
     /**
-     * Creates toolbar buttons and adds them to the specified JToolBar
-     */
-    private void addAttributesButtonsTo(JToolBar bar, DrawingEditor editor) {
-        JButton b;
-
-        b = bar.add(new PickAttributesAction(editor));
-        b.setFocusable(false);
-        b = bar.add(new ApplyAttributesAction(editor));
-        b.setFocusable(false);
-        bar.addSeparator();
-
-        addColorButtonsTo(bar, editor);
-        bar.addSeparator();
-        addStrokeButtonsTo(bar, editor);
-        bar.addSeparator();
-        ButtonFactory.addFontButtonsTo(bar, editor);
-    }
-
-    private void addColorButtonsTo(JToolBar bar, DrawingEditor editor) {
-        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-        HashMap<AttributeKey, Object> defaultAttributes = new HashMap<AttributeKey, Object>();
-        STROKE_GRADIENT.put(defaultAttributes, (Gradient) null);
-        bar.add(
-                ButtonFactory.createEditorColorButton(editor,
-                STROKE_COLOR, ButtonFactory.WEBSAVE_COLORS, ButtonFactory.WEBSAVE_COLORS_COLUMN_COUNT,
-                "attribute.strokeColor", labels,
-                defaultAttributes));
-        defaultAttributes = new HashMap<AttributeKey, Object>();
-        FILL_GRADIENT.put(defaultAttributes, (Gradient) null);
-        bar.add(
-                ButtonFactory.createEditorColorButton(editor,
-                FILL_COLOR, ButtonFactory.WEBSAVE_COLORS, ButtonFactory.WEBSAVE_COLORS_COLUMN_COUNT,
-                "attribute.fillColor", labels,
-                defaultAttributes));
-    }
-
-    private void addStrokeButtonsTo(JToolBar bar, DrawingEditor editor) {
-        bar.add(ButtonFactory.createStrokeWidthButton(editor));
-        bar.add(ButtonFactory.createStrokeDashesButton(editor));
-        bar.add(ButtonFactory.createStrokeCapButton(editor));
-        bar.add(ButtonFactory.createStrokeJoinButton(editor));
-    }
-
-    /**
      * Creates toolbars for the application.
      */
     @Override
@@ -182,7 +139,7 @@ public class ODGApplicationModel extends DefaultApplicationModel {
         tb.setName(labels.getString("window.drawToolBar.title"));
         list.add(tb);
         tb = new JToolBar();
-        addAttributesButtonsTo(tb, editor);
+        oDGApplicationModelProduct.addAttributesButtonsTo(tb, editor);
         tb.setName(labels.getString("window.attributesToolBar.title"));
         list.add(tb);
         tb = new JToolBar();
@@ -285,4 +242,15 @@ public class ODGApplicationModel extends DefaultApplicationModel {
         }
         return c;
     }
+
+	private void readObject(java.io.ObjectInputStream stream)
+			throws java.io.IOException, java.lang.ClassNotFoundException {
+		stream.defaultReadObject();
+		this.oDGApplicationModelProduct = (ODGApplicationModelProduct) stream.readObject();
+	}
+
+	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(this.oDGApplicationModelProduct);
+	}
 }

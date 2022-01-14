@@ -41,18 +41,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class ODGInputFormat implements InputFormat {
 
-    /**
+    private ODGInputFormatProduct oDGInputFormatProduct = new ODGInputFormatProduct();
+	/**
      * Set this to true, to get debug output on System.out.
      */
     private static final boolean DEBUG = true;
-    /**
-     * Holds the figures that are currently being read.
-     */
-    private LinkedList<Figure> figures;
-    /**
-     * Holds the document that is currently being read.
-     */
-    private IXMLElement document;
     private ODGStylesReader styles;
 
     /** Creates a new instance. */
@@ -159,7 +152,7 @@ public class ODGInputFormat implements InputFormat {
         styles = new ODGStylesReader();
         styles.read(stylesIn);
 
-        readFiguresFromDocumentContent(contentIn, drawing, replace);
+        oDGInputFormatProduct.readFiguresFromDocumentContent(contentIn, drawing, replace, this);
     }
 
     /**
@@ -168,195 +161,14 @@ public class ODGInputFormat implements InputFormat {
      */
     @SuppressWarnings("unchecked")
     public void readFiguresFromDocumentContent(InputStream in, Drawing drawing, boolean replace) throws IOException {
-        this.figures = new LinkedList<Figure>();
-        IXMLParser parser;
-        try {
-            parser = XMLParserFactory.createDefaultXMLParser();
-        } catch (Exception ex) {
-            InternalError e = new InternalError("Unable to instantiate NanoXML Parser");
-            e.initCause(ex);
-            throw e;
-        }
-        IXMLReader reader = new StdXMLReader(in);
-        parser.setReader(reader);
-        try {
-            document = (IXMLElement) parser.parse();
-        } catch (XMLException ex) {
-            IOException e = new IOException(ex.getMessage());
-            e.initCause(ex);
-            throw e;
-        }
-
-        if (styles == null) {
-            styles = new ODGStylesReader();
-        }
-        styles.read(document);
-
-
-        // Search for the first 'office:drawing' element in the XML document
-        // in preorder sequence
-        IXMLElement drawingElem = document;
-        Stack<Iterator> stack = new Stack<Iterator>();
-        LinkedList<IXMLElement> ll = new LinkedList<IXMLElement>();
-        ll.add(document);
-        stack.push(ll.iterator());
-        while (!stack.empty() && stack.peek().hasNext()) {
-            Iterator<IXMLElement> iter = stack.peek();
-            IXMLElement node = iter.next();
-            Iterator<IXMLElement> children = node.getChildren().iterator();
-
-            if (!iter.hasNext()) {
-                stack.pop();
-            }
-            if (children.hasNext()) {
-                stack.push(children);
-            }
-            if (node.getName() != null
-                    && node.getName().equals("drawing")
-                    && (node.getNamespace() == null
-                    || node.getNamespace().equals(OFFICE_NAMESPACE))) {
-                drawingElem = node;
-                break;
-            }
-        }
-
-        if (drawingElem.getName() == null
-                || !drawingElem.getName().equals("drawing")
-                || (drawingElem.getNamespace() != null
-                && !drawingElem.getNamespace().equals(OFFICE_NAMESPACE))) {
-            throw new IOException("'office:drawing' element expected: " + drawingElem.getName());
-        }
-
-        readDrawingElement(drawingElem);
-
-        if (replace) {
-            drawing.removeAllChildren();
-        }
-        drawing.addAll(figures);
-    }
-
-    /**
-     * Reads an ODG "office:drawing" element.
-     */
-    private void readDrawingElement(IXMLElement elem)
-            throws IOException {
-        /*
-        2.3.2Drawing Documents
-        The content of drawing document consists of a sequence of draw pages.
-        <define name="office-body-content" combine="choice">
-        <element name="office:drawing">
-        <ref name="office-drawing-attlist"/>
-        <ref name="office-drawing-content-prelude"/>
-        <ref name="office-drawing-content-main"/>
-        <ref name="office-drawing-content-epilogue"/>
-        </element>
-        </define>
-        <define name="office-drawing-attlist">
-        <empty/>
-        </define>
-
-        Drawing Document Content Model
-        The drawing document prelude may contain text declarations only. To allow office applications to
-        implement functionality that usually is available in spreadsheets for drawing documents, it may
-        also contain elements that implement enhanced table features. See also section 2.3.4.
-        <define name="office-drawing-content-prelude">
-        <ref name="text-decls"/>
-        <ref name="table-decls"/>
-        </define>
-
-        The main document content contains a sequence of draw pages.
-        <define name="office-drawing-content-main">
-        <zeroOrMore>
-        <ref name="draw-page"/>
-        </zeroOrMore>
-        </define>
-
-        There are no drawing documents specific epilogue elements, but the epilogue may contain
-        elements that implement enhanced table features. See also section 2.3.4.
-        <define name="office-drawing-content-epilogue">
-        <ref name="table-functions"/>
-        </define>
-         */
-
-        for (IXMLElement child : elem.getChildren()) {
-            if (child.getNamespace() == null
-                    || child.getNamespace().equals(DRAWING_NAMESPACE)) {
-                String name = child.getName();
-                if ("page".equals(name)) {
-                    readPageElement(child);
-                }
-            }
-        }
-    }
-
-    /**
-     * Reads an ODG "draw:page" element.
-     */
-    private void readPageElement(IXMLElement elem)
-            throws IOException {
-        /* 9.1.4Drawing Pages
-         *
-        The element <draw:page> is a container for content in a drawing or presentation document.
-        Drawing pages are used for the following:
-        • Forms (see section 11.1)
-        • Drawings (see section 9.2)
-        • Frames (see section 9.3)
-        • Presentation Animations (see section 9.7)
-        • Presentation Notes (see section 9.1.5)
-         *
-        A master page must be assigned to each drawing page.
-         *
-        <define name="draw-page">
-        <element name="draw:page">
-        <ref name="common-presentation-header-footer-attlist"/>
-        <ref name="draw-page-attlist"/>
-        <optional>
-        <ref name="office-forms"/>
-        </optional>
-        <zeroOrMore>
-        <ref name="shape"/>
-        </zeroOrMore>
-        <optional>
-        <choice>
-        <ref name="presentation-animations"/>
-        <ref name="animation-element"/>
-        </choice>
-        </optional>
-        <optional>
-        <ref name="presentation-notes"/>
-        </optional>
-        </element>
-        </define>
-         *
-        The attributes that may be associated with the <draw:page> element are:
-        • Page name
-        • Page style
-        • Master page
-        • Presentation page layout
-        • Header declaration
-        • Footer declaration
-        • Date and time declaration
-        • ID
-         *
-        The elements that my be included in the <draw:page> element are:
-        • Forms
-        • Shapes
-        • Animations
-        • Presentation notes
-         */
-        for (IXMLElement child : elem.getChildren()) {
-            ODGFigure figure = readElement(child);
-            if (figure != null) {
-                figures.add(figure);
-            }
-        }
+        oDGInputFormatProduct.readFiguresFromDocumentContent(in, drawing, replace, this);
     }
 
     /**
      * Reads an ODG element.
      */
     @Nullable
-    private ODGFigure readElement(IXMLElement elem)
+    public ODGFigure readElement(IXMLElement elem)
             throws IOException {
         /*
         Drawing Shapes
@@ -400,7 +212,7 @@ public class ODGInputFormat implements InputFormat {
             } else if ("frame".equals(name)) {
                 f = readFrameElement(elem);
             } else if ("g".equals(name)) {
-                f = readGElement(elem);
+                f = oDGInputFormatProduct.readGElement(elem, this);
             } else if ("line".equals(name)) {
                 f = readLineElement(elem);
             } else if ("measure".equals(name)) {
@@ -684,33 +496,6 @@ public class ODGInputFormat implements InputFormat {
      */
     private ODGFigure readFrameElement(IXMLElement elem) throws IOException {
         throw new UnsupportedOperationException("not implemented.");
-    }
-
-    /**
-     * Creates a ODGGroupFigure.
-     */
-    private CompositeFigure createGroupFigure()
-            throws IOException {
-        ODGGroupFigure figure = new ODGGroupFigure();
-        return figure;
-    }
-
-    private ODGFigure readGElement(IXMLElement elem)
-            throws IOException {
-        CompositeFigure g = createGroupFigure();
-
-        for (IXMLElement child : elem.getChildren()) {
-            Figure childFigure = readElement(child);
-            if (childFigure != null) {
-                g.basicAdd(childFigure);
-            }
-        }
-        /*
-        readTransformAttribute(elem, a);
-        if (TRANSFORM.get(a) != null) {
-        g.transform(TRANSFORM.get(a));
-        }*/
-        return (ODGFigure) g;
     }
 
     /**
@@ -1827,4 +1612,12 @@ public class ODGInputFormat implements InputFormat {
         }
         return paths.toArray(new BezierPath[paths.size()]);
     }
+
+	public void setStyles(ODGStylesReader styles) {
+		this.styles = styles;
+	}
+
+	public ODGStylesReader getStyles() {
+		return styles;
+	}
 }
