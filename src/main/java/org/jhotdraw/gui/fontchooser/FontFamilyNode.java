@@ -72,13 +72,18 @@ public class FontFamilyNode implements MutableTreeNode, Comparable<FontFamilyNod
 
     @Override
     public void insert(MutableTreeNode newChild, int index) {
-        FontFamilyNode oldParent = (FontFamilyNode) newChild.getParent();
-        if (oldParent != null) {
-            oldParent.remove(newChild);
-        }
-        newChild.setParent(this);
-        children.add(index, (FontFaceNode) newChild);
+        FontFamilyNode oldParent = oldParent(newChild);
+		children.add(index, (FontFaceNode) newChild);
     }
+
+	private FontFamilyNode oldParent(MutableTreeNode newChild) {
+		FontFamilyNode oldParent = (FontFamilyNode) newChild.getParent();
+		if (oldParent != null) {
+			oldParent.remove(newChild);
+		}
+		newChild.setParent(this);
+		return oldParent;
+	}
 
     @Override
     public void remove(int childIndex) {

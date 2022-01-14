@@ -86,13 +86,18 @@ public class FontCollectionNode implements MutableTreeNode, Comparable<FontColle
 
     @Override
     public void insert(MutableTreeNode newChild, int index) {
-        FontCollectionNode oldParent = (FontCollectionNode) newChild.getParent();
-        if (oldParent != null) {
-            oldParent.remove(newChild);
-        }
-        newChild.setParent(this);
-        children.add(index, (FontFamilyNode) newChild);
+        FontCollectionNode oldParent = oldParent(newChild);
+		children.add(index, (FontFamilyNode) newChild);
     }
+
+	private FontCollectionNode oldParent(MutableTreeNode newChild) {
+		FontCollectionNode oldParent = (FontCollectionNode) newChild.getParent();
+		if (oldParent != null) {
+			oldParent.remove(newChild);
+		}
+		newChild.setParent(this);
+		return oldParent;
+	}
 
     @Override
     public void remove(int childIndex) {

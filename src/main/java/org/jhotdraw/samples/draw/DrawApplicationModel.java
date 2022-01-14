@@ -106,16 +106,13 @@ public class DrawApplicationModel extends DefaultApplicationModel {
 
     public void addDefaultCreationButtonsTo(JToolBar tb, final DrawingEditor editor,
             Collection<Action> drawingActions, Collection<Action> selectionActions) {
-        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+        ConnectionFigure lc = lc2(tb, editor, drawingActions, selectionActions);
+		ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
 
-        ButtonFactory.addSelectionToolTo(tb, editor, drawingActions, selectionActions);
         tb.addSeparator();
 
         AbstractAttributedFigure af;
         CreationTool ct;
-        ConnectionTool cnt;
-        ConnectionFigure lc;
-
         ButtonFactory.addToolTo(tb, editor, new CreationTool(new RectangleFigure()), "edit.createRectangle", labels);
         ButtonFactory.addToolTo(tb, editor, new CreationTool(new RoundRectangleFigure()), "edit.createRoundRectangle", labels);
         ButtonFactory.addToolTo(tb, editor, new CreationTool(new EllipseFigure()), "edit.createEllipse", labels);
@@ -126,18 +123,29 @@ public class DrawApplicationModel extends DefaultApplicationModel {
         af = (AbstractAttributedFigure) ct.getPrototype();
         af.set(END_DECORATION, new ArrowTip(0.35, 12, 11.3));
         ButtonFactory.addToolTo(tb, editor, new ConnectionTool(new LineConnectionFigure()), "edit.createLineConnection", labels);
-        ButtonFactory.addToolTo(tb, editor, cnt = new ConnectionTool(new LineConnectionFigure()), "edit.createElbowConnection", labels);
-        lc = cnt.getPrototype();
-        lc.setLiner(new ElbowLiner());
-        ButtonFactory.addToolTo(tb, editor, cnt = new ConnectionTool(new LineConnectionFigure()), "edit.createCurvedConnection", labels);
-        lc = cnt.getPrototype();
-        lc.setLiner(new CurvedLiner());
         ButtonFactory.addToolTo(tb, editor, new BezierTool(new BezierFigure()), "edit.createScribble", labels);
         ButtonFactory.addToolTo(tb, editor, new BezierTool(new BezierFigure(true)), "edit.createPolygon", labels);
         ButtonFactory.addToolTo(tb, editor, new TextCreationTool(new TextFigure()), "edit.createText", labels);
         ButtonFactory.addToolTo(tb, editor, new TextAreaCreationTool(new TextAreaFigure()), "edit.createTextArea", labels);
         ButtonFactory.addToolTo(tb, editor, new ImageTool(new ImageFigure()), "edit.createImage", labels);
     }
+
+	private ConnectionFigure lc2(JToolBar tb, final DrawingEditor editor, Collection<Action> drawingActions,
+			Collection<Action> selectionActions) throws java.util.MissingResourceException {
+		ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+		ButtonFactory.addSelectionToolTo(tb, editor, drawingActions, selectionActions);
+		ConnectionTool cnt;
+		ConnectionFigure lc;
+		ButtonFactory.addToolTo(tb, editor, cnt = new ConnectionTool(new LineConnectionFigure()),
+				"edit.createElbowConnection", labels);
+		lc = cnt.getPrototype();
+		lc.setLiner(new ElbowLiner());
+		ButtonFactory.addToolTo(tb, editor, cnt = new ConnectionTool(new LineConnectionFigure()),
+				"edit.createCurvedConnection", labels);
+		lc = cnt.getPrototype();
+		lc.setLiner(new CurvedLiner());
+		return lc;
+	}
 
     @Override
     public URIChooser createOpenChooser(Application a, @Nullable View v) {

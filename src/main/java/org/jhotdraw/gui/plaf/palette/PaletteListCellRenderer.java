@@ -77,15 +77,14 @@ public class PaletteListCellRenderer extends DefaultListCellRenderer {
         Color bg = null;
         Color fg = null;
 
-        JList.DropLocation dropLocation = list.getDropLocation();
+        isSelected = isSelected(list, index, isSelected);
+		JList.DropLocation dropLocation = list.getDropLocation();
         if (dropLocation != null
                 && !dropLocation.isInsert()
                 && dropLocation.getIndex() == index) {
 
             bg = plaf.getColor( "List.dropCellBackground");
             fg = plaf.getColor( "List.dropCellForeground");
-
-            isSelected = true;
         }
 
 	if (isSelected) {
@@ -109,20 +108,33 @@ public class PaletteListCellRenderer extends DefaultListCellRenderer {
 	setEnabled(list.isEnabled());
 	setFont(list.getFont());
 
-        Border border = null;
-        if (cellHasFocus) {
-            if (isSelected) {
-                border = plaf.getBorder( "List.focusSelectedCellHighlightBorder");
-            }
-            if (border == null) {
-                border = plaf.getBorder("List.focusCellHighlightBorder");
-            }
-        } else {
-            border = getNoFocusBorder();
-        }
-	setBorder(border);
+        Border border = border(isSelected, cellHasFocus, plaf);
+		setBorder(border);
 
 	return this;
     }
+
+	private boolean isSelected(JList list, int index, boolean isSelected) {
+		JList.DropLocation dropLocation = list.getDropLocation();
+		if (dropLocation != null && !dropLocation.isInsert() && dropLocation.getIndex() == index) {
+			isSelected = true;
+		}
+		return isSelected;
+	}
+
+	private Border border(boolean isSelected, boolean cellHasFocus, PaletteLookAndFeel plaf) {
+		Border border = null;
+		if (cellHasFocus) {
+			if (isSelected) {
+				border = plaf.getBorder("List.focusSelectedCellHighlightBorder");
+			}
+			if (border == null) {
+				border = plaf.getBorder("List.focusCellHighlightBorder");
+			}
+		} else {
+			border = getNoFocusBorder();
+		}
+		return border;
+	}
 
 }

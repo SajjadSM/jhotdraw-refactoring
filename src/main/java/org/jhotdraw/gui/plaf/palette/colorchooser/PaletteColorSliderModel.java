@@ -38,15 +38,17 @@ public class PaletteColorSliderModel extends DefaultColorSliderModel {
         if (slider.getClientProperty("colorSliderModel") != null) {
             ((DefaultColorSliderModel) slider.getClientProperty("colorSliderModel")).unconfigureSlider(slider);
         }
-        if (!(slider.getUI() instanceof PaletteColorSliderUI)) {
-            slider.setUI((PaletteColorSliderUI) PaletteColorSliderUI.createUI(slider));
-        }
-        BoundedRangeModel brm = getBoundedRangeModel(componentIndex);
-        slider.setModel(brm);
-        
-        slider.putClientProperty("colorSliderModel", this);
-        slider.putClientProperty("colorComponentIndex", componentIndex);
-        addColorSlider(slider);
+        slider(componentIndex, slider);
+		addColorSlider(slider);
     }
+	private void slider(int componentIndex, JSlider slider) {
+		if (!(slider.getUI() instanceof PaletteColorSliderUI)) {
+			slider.setUI((PaletteColorSliderUI) PaletteColorSliderUI.createUI(slider));
+		}
+		BoundedRangeModel brm = getBoundedRangeModel(componentIndex);
+		slider.setModel(brm);
+		slider.putClientProperty("colorSliderModel", this);
+		slider.putClientProperty("colorComponentIndex", componentIndex);
+	}
 
 }

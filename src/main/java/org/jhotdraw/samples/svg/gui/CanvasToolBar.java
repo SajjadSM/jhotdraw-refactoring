@@ -186,12 +186,11 @@ public class CanvasToolBar extends AbstractToolBar {
 
                 p.removeAll();
                 p.setBorder(new EmptyBorder(5, 5, 5, 8));
-                ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
+                AbstractButton btn = btn();
+				ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
                 GridBagLayout layout = new GridBagLayout();
                 p.setLayout(layout);
                 GridBagConstraints gbc;
-                AbstractButton btn;
-
                 // Fill color field with button
                 JAttributeTextField<Color> colorField = new JAttributeTextField<Color>();
                 colorField.setColumns(7);
@@ -206,10 +205,7 @@ public class CanvasToolBar extends AbstractToolBar {
                 gbc.fill = GridBagConstraints.HORIZONTAL;
                 gbc.anchor = GridBagConstraints.FIRST_LINE_START;
                 p1.add(colorField, gbc);
-                 btn = ButtonFactory.createDrawingColorChooserButton(editor,
-                        CANVAS_FILL_COLOR, "attribute.canvasFillColor", labels,
-                        null, new Rectangle(3, 3, 10, 10), PaletteColorChooserUI.class, disposables);
-                btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
+                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
                 disposables.add(new DrawingComponentRepainter(editor, btn));
                 ((JPopupButton) btn).setAction(null, null);
                 gbc = new GridBagConstraints();
@@ -335,6 +331,14 @@ public class CanvasToolBar extends AbstractToolBar {
         }
         return p;
     }
+
+	private AbstractButton btn() throws java.util.MissingResourceException {
+		ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
+		AbstractButton btn;
+		btn = ButtonFactory.createDrawingColorChooserButton(editor, CANVAS_FILL_COLOR, "attribute.canvasFillColor",
+				labels, null, new Rectangle(3, 3, 10, 10), PaletteColorChooserUI.class, disposables);
+		return btn;
+	}
 
     @Override
     protected String getID() {

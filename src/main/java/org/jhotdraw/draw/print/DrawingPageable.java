@@ -39,13 +39,11 @@ import java.awt.print.*;
  */
 public class DrawingPageable implements Pageable {
 
-    private Drawing drawing;
-    private PageFormat pageFormat;
-    private boolean isAutorotate = false;
-
+    private DrawingPageableProduct drawingPageableProduct = new DrawingPageableProduct();
+	private PageFormat pageFormat;
     /** Creates a new instance. */
     public DrawingPageable(Drawing drawing) {
-        this.drawing = drawing;
+        drawingPageableProduct.setDrawing(drawing);
         Paper paper = new Paper();
         pageFormat = new PageFormat();
         pageFormat.setPaper(paper);
@@ -70,61 +68,16 @@ public class DrawingPageable implements Pageable {
 
             @Override
             public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-                return printPage(graphics, pageFormat, pageIndex);
+                return drawingPageableProduct.printPage(graphics, pageFormat, pageIndex, DrawingPageable.this);
             }
         };
     }
 
     public int printPage(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        if (pageIndex < 0 || pageIndex >= getNumberOfPages()) {
-            return Printable.NO_SUCH_PAGE;
-        }
-        if (drawing.getChildCount() > 0) {
-
-            AffineTransform tx = tx(graphics, pageFormat);
-			Graphics2D g = (Graphics2D) graphics;
-            setRenderingHints(g);
-
-            g.transform(tx);
-        }
-        return Printable.PAGE_EXISTS;
+        return drawingPageableProduct.printPage(graphics, pageFormat, pageIndex, this);
     }
 
-	private AffineTransform tx(Graphics graphics, PageFormat pageFormat) {
-		drawing(graphics);
-		Rectangle2D.Double drawBounds = null;
-		for (Figure f : drawing.getChildren()) {
-			if (drawBounds == null) {
-				drawBounds = f.getDrawingArea();
-			} else {
-				drawBounds.add(f.getDrawingArea());
-			}
-		}
-		AffineTransform tx = new AffineTransform();
-		tx.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-		if (isAutorotate && drawBounds.width > drawBounds.height
-				&& pageFormat.getImageableWidth() < pageFormat.getImageableHeight()) {
-			double scaleFactor = Math.min(pageFormat.getImageableWidth() / drawBounds.height,
-					pageFormat.getImageableHeight() / drawBounds.width);
-			tx.scale(scaleFactor, scaleFactor);
-			tx.translate(drawBounds.height, 0d);
-			tx.rotate(Math.PI / 2d, 0, 0);
-			tx.translate(-drawBounds.x, -drawBounds.y);
-		} else {
-			double scaleFactor = Math.min(pageFormat.getImageableWidth() / drawBounds.width,
-					pageFormat.getImageableHeight() / drawBounds.height);
-			tx.scale(scaleFactor, scaleFactor);
-			tx.translate(-drawBounds.x, -drawBounds.y);
-		}
-		return tx;
-	}
-
-	private void drawing(Graphics graphics) {
-		Graphics2D g = (Graphics2D) graphics;
-		drawing.draw(g);
-	}
-
-    protected void setRenderingHints(Graphics2D g) {
+	protected void setRenderingHints(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
                 RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

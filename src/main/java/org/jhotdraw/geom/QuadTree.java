@@ -67,13 +67,17 @@ public class QuadTree<T> implements Serializable {
             treeBounds.add(bounds);
         }
         root.bounds = treeBounds;
-        i = outside.entrySet().iterator();
-        while (i.hasNext()) {
+        i = i(i);
+		while (i.hasNext()) {
             entry = i.next();
             root.add(entry.getKey(), entry.getValue());
         }
-        outside.clear();
     }
+	private Iterator<Map.Entry<T, Rectangle2D.Double>> i(Iterator<Map.Entry<T, Rectangle2D.Double>> i) {
+		i = outside.entrySet().iterator();
+		outside.clear();
+		return i;
+	}
     public void remove(T o) {
         outside.remove(o);
         root.remove(o);

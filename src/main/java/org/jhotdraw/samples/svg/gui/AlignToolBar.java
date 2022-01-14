@@ -71,19 +71,16 @@ public class AlignToolBar extends AbstractToolBar {
                 GridBagLayout layout = new GridBagLayout();
                 p.setLayout(layout);
 
-                GridBagConstraints gbc;
-                AbstractButton btn;
+                GridBagConstraints gbc = gbc();
+				AbstractButton btn;
                 AbstractSelectedAction d;
 
-                gbc = new GridBagConstraints();
-                gbc.gridy = 0;
                 btn = new JButton(d = new AlignAction.West(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
                 btn.setText(null);
                 p.add(btn, gbc);
 
-                gbc.insets = new Insets(0, 3, 0, 0);
                 btn = new JButton(d = new AlignAction.East(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -91,8 +88,6 @@ public class AlignToolBar extends AbstractToolBar {
                 btn.setText(null);
                 p.add(btn, gbc);
 
-                gbc.gridy = 1;
-                gbc.insets = new Insets(3, 0, 0, 0);
                 btn = new JButton(d = new AlignAction.North(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -100,7 +95,6 @@ public class AlignToolBar extends AbstractToolBar {
                 btn.setText(null);
                 p.add(btn, gbc);
 
-                gbc.insets = new Insets(3, 3, 0, 0);
                 btn = new JButton(d = new AlignAction.South(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -108,9 +102,6 @@ public class AlignToolBar extends AbstractToolBar {
                 btn.setText(null);
                 p.add(btn, gbc);
 
-                gbc.gridx = 0;
-                gbc.gridy = 2;
-                gbc.insets = new Insets(3, 0, 0, 0);
                 btn = new JButton(d = new AlignAction.Horizontal(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -118,8 +109,6 @@ public class AlignToolBar extends AbstractToolBar {
                 btn.setText(null);
                 p.add(btn, gbc);
 
-                gbc.gridx = 1;
-                gbc.insets = new Insets(3, 3, 0, 0);
                 btn = new JButton(d = new AlignAction.Vertical(editor, labels));
                 disposables.add(d);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -131,6 +120,22 @@ public class AlignToolBar extends AbstractToolBar {
         }
         return p;
     }
+
+	private GridBagConstraints gbc() {
+		GridBagConstraints gbc;
+		gbc = new GridBagConstraints();
+		gbc.gridy = 0;
+		gbc.insets = new Insets(0, 3, 0, 0);
+		gbc.gridy = 1;
+		gbc.insets = new Insets(3, 0, 0, 0);
+		gbc.insets = new Insets(3, 3, 0, 0);
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.insets = new Insets(3, 0, 0, 0);
+		gbc.gridx = 1;
+		gbc.insets = new Insets(3, 3, 0, 0);
+		return gbc;
+	}
 
     /** This method is called from within the constructor to
      * initialize the form.

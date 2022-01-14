@@ -49,17 +49,18 @@ public class ColorSliderTextFieldHandler implements DocumentListener, ChangeList
     }
     protected void docChanged() {
         if (textField.hasFocus()) {
-            BoundedRangeModel brm = ccModel.getBoundedRangeModel(component);
-            try {
-                int value = Integer.decode(textField.getText()).intValue();
-                if (brm.getMinimum() <= value && value <= brm.getMaximum()) {
-                    brm.setValue(value);
-                }
-            } catch (NumberFormatException e) {
-                // Don't change value if it isn't numeric.
-            }
+            BoundedRangeModel brm = brm();
         }
     }
+
+	private BoundedRangeModel brm() {
+		BoundedRangeModel brm = ccModel.getBoundedRangeModel(component);
+		int value = Integer.decode(textField.getText()).intValue();
+		if (brm.getMinimum() <= value && value <= brm.getMaximum()) {
+			brm.setValue(value);
+		}
+		return brm;
+	}
     @Override
     public void stateChanged(ChangeEvent e) {
         if (! textField.hasFocus()) {

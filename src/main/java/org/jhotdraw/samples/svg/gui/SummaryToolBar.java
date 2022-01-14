@@ -47,13 +47,18 @@ public class SummaryToolBar extends JToolBar {
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
         
-        GridBagConstraints gbc;
-        gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0,10,0,0);
-        gbc.weightx = 1d;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        layout.setConstraints(summaryField, gbc);
+        GridBagConstraints gbc = gbc();
+		layout.setConstraints(summaryField, gbc);
     }
+
+	private GridBagConstraints gbc() {
+		GridBagConstraints gbc;
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 10, 0, 0);
+		gbc.weightx = 1d;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		return gbc;
+	}
     
     public String getSummary() {
         return summaryField.getText();

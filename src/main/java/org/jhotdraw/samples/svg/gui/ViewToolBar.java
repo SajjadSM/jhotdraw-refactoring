@@ -169,9 +169,8 @@ public class ViewToolBar extends AbstractToolBar {
                 gbc.insets = new Insets(0, 0, 0, 0);
                 p.add(btn, gbc);
 
-                // Zoom factor field and zoom button
-                final JLifeFormattedTextField scaleFactorField = new JLifeFormattedTextField();
-                scaleFactorField.setColumns(4);
+                JLifeFormattedTextField scaleFactorField = scaleFactorField();
+				scaleFactorField.setColumns(4);
                 scaleFactorField.setToolTipText(labels.getString("view.zoomFactor.toolTipText"));
                 scaleFactorField.setHorizontalAlignment(JLifeFormattedTextField.RIGHT);
                 scaleFactorField.putClientProperty("Palette.Component.segmentPosition", "first");
@@ -181,29 +180,6 @@ public class ViewToolBar extends AbstractToolBar {
                 formatter.setMaximumFractionDigits(1);
                 scaleFactorField.setFormatterFactory(new DefaultFormatterFactory(formatter));
                 scaleFactorField.setHorizontalAlignment(JTextField.LEADING);
-                scaleFactorField.setValue(view.getScaleFactor());
-                scaleFactorField.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if ("value".equals(evt.getPropertyName())) {
-                            if (evt.getNewValue() != null) {
-                                view.setScaleFactor((Double) evt.getNewValue());
-                            }
-                        }
-                    }
-                });
-                view.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getPropertyName() == DrawingView.SCALE_FACTOR_PROPERTY) {
-                            if (evt.getNewValue() != null) {
-                                scaleFactorField.setValue((Double) evt.getNewValue());
-                            }
-                        }
-                    }
-                });
                 gbc = new GridBagConstraints();
                 gbc.gridx = 0;
                 gbc.gridy = 1;
@@ -229,6 +205,32 @@ public class ViewToolBar extends AbstractToolBar {
         }
         return p;
     }
+
+	private JLifeFormattedTextField scaleFactorField() {
+		final JLifeFormattedTextField scaleFactorField = new JLifeFormattedTextField();
+		scaleFactorField.setValue(view.getScaleFactor());
+		scaleFactorField.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("value".equals(evt.getPropertyName())) {
+					if (evt.getNewValue() != null) {
+						view.setScaleFactor((Double) evt.getNewValue());
+					}
+				}
+			}
+		});
+		view.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName() == DrawingView.SCALE_FACTOR_PROPERTY) {
+					if (evt.getNewValue() != null) {
+						scaleFactorField.setValue((Double) evt.getNewValue());
+					}
+				}
+			}
+		});
+		return scaleFactorField;
+	}
 
     @Override
     protected String getID() {

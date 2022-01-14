@@ -34,12 +34,11 @@ public class JDisclosureToolBar extends JToolBar {
     }
 
     private void initComponents() {
-        GridBagConstraints gbc;
-        AbstractButton btn;
+        GridBagConstraints gbc = gbc();
+		AbstractButton btn;
 
         setLayout(new GridBagLayout());
 
-        gbc = new GridBagConstraints();
         if (disclosureButton == null) {
             btn = new JButton();
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
@@ -62,17 +61,23 @@ public class JDisclosureToolBar extends JToolBar {
             btn = disclosureButton;
         }
 
-        gbc.gridx = 0;
-        gbc.insets = new Insets(0, 1, 0, 1);
-        gbc.anchor = GridBagConstraints.SOUTHWEST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weighty = 1d;
-        gbc.weightx = 1d;
         add(btn, gbc);
 
         putClientProperty(PaletteToolBarUI.TOOLBAR_INSETS_OVERRIDE_PROPERTY, new Insets(0, 0, 0, 0));
         putClientProperty(PaletteToolBarUI.TOOLBAR_ICON_PROPERTY, new EmptyIcon(10, 8));
     }
+
+	private GridBagConstraints gbc() {
+		GridBagConstraints gbc;
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.insets = new Insets(0, 1, 0, 1);
+		gbc.anchor = GridBagConstraints.SOUTHWEST;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.weighty = 1d;
+		gbc.weightx = 1d;
+		return gbc;
+	}
 
     public void setDisclosureStateCount(int newValue) {
         int oldValue = getDisclosureStateCount();
@@ -115,15 +120,20 @@ public class JDisclosureToolBar extends JToolBar {
         }
 
         invalidate();
-        Container parent = getParent();
-        while (parent.getParent() != null && !parent.getParent().isValid()) {
-            parent = parent.getParent();
-        }
-        parent.validate();
+        Container parent = parent();
+		parent.validate();
         repaint();
 
         firePropertyChange(DISCLOSURE_STATE_PROPERTY, oldValue, newValue);
     }
+
+	private Container parent() {
+		Container parent = getParent();
+		while (parent.getParent() != null && !parent.getParent().isValid()) {
+			parent = parent.getParent();
+		}
+		return parent;
+	}
 
     public int getDisclosureStateCount() {
         Integer value = (Integer) disclosureButton.getClientProperty(DisclosureIcon.STATE_COUNT_PROPERTY);

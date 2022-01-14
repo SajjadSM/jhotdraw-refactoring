@@ -34,10 +34,8 @@ public class OSXClipboard extends AWTClipboard {
                 @SuppressWarnings("unchecked")
                 boolean isAvailable = (Boolean) c.getMethod("isNativeCodeAvailable").invoke(null);
                 if (isAvailable) {
-                   CompositeTransferable ct = new CompositeTransferable();
-                   ct.add(t);
-                   ct.add((Transferable) c.newInstance());
-                   t = ct;
+                   CompositeTransferable ct = ct(t, c);
+				t = ct;
                 }
             } catch (Throwable ex) {
                 // silently suppress
@@ -45,4 +43,12 @@ public class OSXClipboard extends AWTClipboard {
 
         return t;
     }
+
+	private CompositeTransferable ct(Transferable t, Class c)
+			throws java.lang.InstantiationException, java.lang.IllegalAccessException {
+		CompositeTransferable ct = new CompositeTransferable();
+		ct.add(t);
+		ct.add((Transferable) c.newInstance());
+		return ct;
+	}
 }

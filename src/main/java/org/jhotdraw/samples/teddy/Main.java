@@ -55,17 +55,23 @@ public class Main {
         } else {
             type = "sdi";
         }
-        for (int i = 0; i < args.length; i++) {
-            if ("-app".equals(args[i]) && i < args.length - 1) {
-                type = args[++i];
-                if (!types.containsKey(type)) {
-                    throw new IllegalArgumentException("-app " + args[i]);
-                }
-            }
-        }
-
-        Application app = (Application) Class.forName(types.get(type)).newInstance();
-        app.setModel(tam);
-        app.launch(args);
+        Application app = app(args, tam, types, type);
     }
+
+	private static Application app(String[] args, TeddyApplicationModel tam, HashMap<String, String> types, String type)
+			throws java.lang.IllegalArgumentException, java.lang.ClassNotFoundException,
+			java.lang.InstantiationException, java.lang.IllegalAccessException {
+		for (int i = 0; i < args.length; i++) {
+			if ("-app".equals(args[i]) && i < args.length - 1) {
+				type = args[++i];
+				if (!types.containsKey(type)) {
+					throw new IllegalArgumentException("-app " + args[i]);
+				}
+			}
+		}
+		Application app = (Application) Class.forName(types.get(type)).newInstance();
+		app.setModel(tam);
+		app.launch(args);
+		return app;
+	}
 }

@@ -183,10 +183,8 @@ public class FillToolBar extends AbstractToolBar {
                 opacityField.setToolTipText(labels.getString("attribute.fillOpacity.toolTipText"));
                 opacityField.putClientProperty("Palette.Component.segmentPosition", "first");
                 opacityField.setUI((PaletteFormattedTextFieldUI) PaletteFormattedTextFieldUI.createUI(opacityField));
-                JavaNumberFormatter formatter = new JavaNumberFormatter(0d, 100d, 100d, false, "%");
-                formatter.setUsesScientificNotation(false);
-                formatter.setMaximumFractionDigits(1);
-                opacityField.setFormatterFactory(new DefaultFormatterFactory(formatter));
+                JavaNumberFormatter formatter = formatter();
+				opacityField.setFormatterFactory(new DefaultFormatterFactory(formatter));
                 opacityField.setHorizontalAlignment(JTextField.LEFT);
                 disposables.add(new FigureAttributeEditorHandler<Double>(FILL_OPACITY, opacityField, editor));
                 gbc = new GridBagConstraints();
@@ -235,6 +233,13 @@ public class FillToolBar extends AbstractToolBar {
         }
         return p;
     }
+
+	private JavaNumberFormatter formatter() {
+		JavaNumberFormatter formatter = new JavaNumberFormatter(0d, 100d, 100d, false, "%");
+		formatter.setUsesScientificNotation(false);
+		formatter.setMaximumFractionDigits(1);
+		return formatter;
+	}
 
     @Override
     protected String getID() {

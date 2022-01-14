@@ -1388,41 +1388,55 @@ public class SVGInputFormat implements InputFormat {
      * http://www.w3.org/TR/SVGMobile12/types.html#DataTypeLength
      */
     private double toLength(IXMLElement elem, String str, double percentFactor) throws IOException {
-        double scaleFactor = 1d;
-        if (str == null || str.length() == 0 || str.equals("none")) {
+        double scaleFactor = scaleFactor2(elem, str, percentFactor);
+		if (str == null || str.length() == 0 || str.equals("none")) {
             return 0d;
         }
 
         if (str.endsWith("%")) {
             str = str.substring(0, str.length() - 1);
-            scaleFactor = percentFactor;
         } else if (str.endsWith("px")) {
             str = str.substring(0, str.length() - 2);
         } else if (str.endsWith("pt")) {
             str = str.substring(0, str.length() - 2);
-            scaleFactor = 1.25;
         } else if (str.endsWith("pc")) {
             str = str.substring(0, str.length() - 2);
-            scaleFactor = 15;
         } else if (str.endsWith("mm")) {
             str = str.substring(0, str.length() - 2);
-            scaleFactor = 3.543307;
         } else if (str.endsWith("cm")) {
             str = str.substring(0, str.length() - 2);
-            scaleFactor = 35.43307;
         } else if (str.endsWith("in")) {
             str = str.substring(0, str.length() - 2);
-            scaleFactor = 90;
         } else if (str.endsWith("em")) {
             str = str.substring(0, str.length() - 2);
-            // XXX - This doesn't work
-            scaleFactor = toLength(elem, readAttribute(elem, "font-size", "0"), percentFactor);
         } else {
-            scaleFactor = 1d;
         }
 
         return Double.parseDouble(str) * scaleFactor;
     }
+
+	private double scaleFactor2(IXMLElement elem, String str, double percentFactor) throws java.io.IOException {
+		double scaleFactor = 1d;
+		if (str.endsWith("%")) {
+			scaleFactor = percentFactor;
+		} else if (str.endsWith("px")) {
+		} else if (str.endsWith("pt")) {
+			scaleFactor = 1.25;
+		} else if (str.endsWith("pc")) {
+			scaleFactor = 15;
+		} else if (str.endsWith("mm")) {
+			scaleFactor = 3.543307;
+		} else if (str.endsWith("cm")) {
+			scaleFactor = 35.43307;
+		} else if (str.endsWith("in")) {
+			scaleFactor = 90;
+		} else if (str.endsWith("em")) {
+			scaleFactor = toLength(elem, readAttribute(elem, "font-size", "0"), percentFactor);
+		} else {
+			scaleFactor = 1d;
+		}
+		return scaleFactor;
+	}
 
     /**
      * Returns a value as a String array.
@@ -2655,12 +2669,8 @@ public class SVGInputFormat implements InputFormat {
         //Computed value:  	 Specified value, except inherit
         value = readInheritAttribute(elem, "stroke-dasharray", "none");
         if (!value.equals("none")) {
-            String[] values = toWSOrCommaSeparatedArray(value);
-            double[] dashes = new double[values.length];
-            for (int i = 0; i < values.length; i++) {
-                dashes[i] = toNumber(elem, values[i]);
-            }
-            STROKE_DASHES.put(a, dashes);
+            double[] dashes = dashes(elem, value);
+			STROKE_DASHES.put(a, dashes);
         }
 
         //'stroke-dashoffset'
@@ -2740,6 +2750,15 @@ public class SVGInputFormat implements InputFormat {
     }
     /* Reads viewport attributes.
      */
+
+	private double[] dashes(IXMLElement elem, String value) throws java.io.IOException {
+		String[] values = toWSOrCommaSeparatedArray(value);
+		double[] dashes = new double[values.length];
+		for (int i = 0; i < values.length; i++) {
+			dashes[i] = toNumber(elem, values[i]);
+		}
+		return dashes;
+	}
 
     private void readViewportAttributes(IXMLElement elem, HashMap<AttributeKey, Object> a)
             throws IOException {
@@ -3004,23 +3023,8 @@ public class SVGInputFormat implements InputFormat {
         boolean isRelativeToFigureBounds =
                 readAttribute(elem, "gradientUnits", "objectBoundingBox").equals("objectBoundingBox");
 
-        ArrayList<IXMLElement> stops = elem.getChildrenNamed("stop", SVG_NAMESPACE);
-        if (stops.size() == 0) {
-            stops = elem.getChildrenNamed("stop");
-        }
-        if (stops.size() == 0) {
-            // FIXME - Implement xlink support throughout SVGInputFormat
-            String xlink = readAttribute(elem, "xlink:href", "");
-            if (xlink.startsWith("#")
-                    && identifiedElements.get(xlink.substring(1)) != null) {
-                stops = identifiedElements.get(xlink.substring(1)).getChildrenNamed("stop", SVG_NAMESPACE);
-                if (stops.size() == 0) {
-                    stops = identifiedElements.get(xlink.substring(1)).getChildrenNamed("stop");
-                }
-            }
-        }
-
-        double[] stopOffsets = new double[stops.size()];
+        ArrayList<IXMLElement> stops = stops(elem);
+		double[] stopOffsets = new double[stops.size()];
         Color[] stopColors = new Color[stops.size()];
         double[] stopOpacities = new double[stops.size()];
         for (int i = 0; i < stops.size(); i++) {
@@ -3069,6 +3073,23 @@ public class SVGInputFormat implements InputFormat {
     /* Reads font attributes as listed in
      * http://www.w3.org/TR/SVGMobile12/feature.html#Font
      */
+
+	private ArrayList<IXMLElement> stops(IXMLElement elem) {
+		ArrayList<IXMLElement> stops = elem.getChildrenNamed("stop", SVG_NAMESPACE);
+		if (stops.size() == 0) {
+			stops = elem.getChildrenNamed("stop");
+		}
+		if (stops.size() == 0) {
+			String xlink = readAttribute(elem, "xlink:href", "");
+			if (xlink.startsWith("#") && identifiedElements.get(xlink.substring(1)) != null) {
+				stops = identifiedElements.get(xlink.substring(1)).getChildrenNamed("stop", SVG_NAMESPACE);
+				if (stops.size() == 0) {
+					stops = identifiedElements.get(xlink.substring(1)).getChildrenNamed("stop");
+				}
+			}
+		}
+		return stops;
+	}
 
     private void readFontAttributes(IXMLElement elem, Map<AttributeKey, Object> a)
             throws IOException {
@@ -3355,8 +3376,8 @@ public class SVGInputFormat implements InputFormat {
 
         if (str != null && !str.equals("none")) {
 
-            StreamPosTokenizer tt = new StreamPosTokenizer(new StringReader(str));
-            tt.resetSyntax();
+            StreamPosTokenizer tt = tt2(elem, str);
+			tt.resetSyntax();
             tt.wordChars('a', 'z');
             tt.wordChars('A', 'Z');
             tt.wordChars(128 + 32, 255);
@@ -3464,6 +3485,80 @@ public class SVGInputFormat implements InputFormat {
         }
         return t;
     }
+
+	private static StreamPosTokenizer tt2(IXMLElement elem, String str) throws java.io.IOException {
+		StreamPosTokenizer tt = new StreamPosTokenizer(new StringReader(str));
+		tt.resetSyntax();
+		tt.wordChars('a', 'z');
+		tt.wordChars('A', 'Z');
+		tt.wordChars(128 + 32, 255);
+		tt.whitespaceChars(0, ' ');
+		tt.whitespaceChars(',', ',');
+		tt.parseNumbers();
+		tt.parseExponents();
+		while (tt.nextToken() != StreamPosTokenizer.TT_EOF) {
+			if (tt.ttype != StreamPosTokenizer.TT_WORD) {
+				throw new IOException("Illegal transform " + str);
+			}
+			String type = tt.sval;
+			if (tt.nextToken() != '(') {
+				throw new IOException("'(' not found in transform " + str);
+			}
+			if ("matrix".equals(type)) {
+				for (int i = 0; i < 6; i++) {
+					if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+						throw new IOException("Matrix value " + i + " not found in transform " + str + " token:"
+								+ tt.ttype + " " + tt.sval);
+					}
+				}
+			} else if ("translate".equals(type)) {
+				if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+					throw new IOException("X-translation value not found in transform " + str);
+				}
+				if (tt.nextToken() == StreamPosTokenizer.TT_NUMBER) {
+				} else {
+					tt.pushBack();
+				}
+			} else if ("scale".equals(type)) {
+				if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+					throw new IOException("X-scale value not found in transform " + str);
+				}
+				if (tt.nextToken() == StreamPosTokenizer.TT_NUMBER) {
+				} else {
+					tt.pushBack();
+				}
+			} else if ("rotate".equals(type)) {
+				if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+					throw new IOException("Angle value not found in transform " + str);
+				}
+				if (tt.nextToken() == StreamPosTokenizer.TT_NUMBER) {
+					if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+						throw new IOException("Y-center value not found in transform " + str);
+					}
+				} else {
+					tt.pushBack();
+				}
+			} else if ("skewX".equals(type)) {
+				if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+					throw new IOException("Skew angle not found in transform " + str);
+				}
+			} else if ("skewY".equals(type)) {
+				if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
+					throw new IOException("Skew angle not found in transform " + str);
+				}
+			} else if ("ref".equals(type)) {
+				while (tt.nextToken() != ')' && tt.ttype != StreamPosTokenizer.TT_EOF) {
+				}
+				tt.pushBack();
+			} else {
+				throw new IOException("Unknown transform " + type + " in " + str + " in element " + elem);
+			}
+			if (tt.nextToken() != ')') {
+				throw new IOException("')' not found in transform " + str);
+			}
+		}
+		return tt;
+	}
 
     @Override
     public javax.swing.filechooser.FileFilter getFileFilter() {

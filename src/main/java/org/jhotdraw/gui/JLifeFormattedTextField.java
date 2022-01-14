@@ -68,21 +68,25 @@ public class JLifeFormattedTextField extends JFormattedTextField {
 
     @Override
     public void setDocument(Document newValue) {
-        Document oldValue = getDocument();
-        super.setDocument(newValue);
+        Document oldValue = oldValue();
+		super.setDocument(newValue);
 
-        if (documentHandler == null) {
-            documentHandler = new DocumentHandler();
-        }
-
-        if (oldValue != null) {
-            oldValue.removeDocumentListener(documentHandler);
-        }
         if (newValue != null) {
             newValue.addDocumentListener(documentHandler);
         }
         updateValue();
     }
+
+	private Document oldValue() {
+		Document oldValue = getDocument();
+		if (documentHandler == null) {
+			documentHandler = new DocumentHandler();
+		}
+		if (oldValue != null) {
+			oldValue.removeDocumentListener(documentHandler);
+		}
+		return oldValue;
+	}
 
     @Override
     public void setValue(Object newValue) {

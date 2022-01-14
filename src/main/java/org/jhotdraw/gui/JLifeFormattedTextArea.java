@@ -24,9 +24,8 @@ import javax.swing.text.Document;
  */
 public class JLifeFormattedTextArea extends JTextArea {
 
-    /** This adapter is used for adapting Formatters to the JTextArea. */
-    private JLifeFormattedTextField formattedTextFieldAdapter;
-    /**
+    private JLifeFormattedTextAreaProduct jLifeFormattedTextAreaProduct = new JLifeFormattedTextAreaProduct();
+	/**
      * Forwards property change events from the formattedTextFieldAdapter to
      * listeners of this object.
      */
@@ -40,40 +39,39 @@ public class JLifeFormattedTextArea extends JTextArea {
     public void setDocument(Document newValue) {
         super.setDocument(newValue);
 
-        // We must check for null here, because setDocument is called in the
-        // super class constructor.
-        if (formattedTextFieldAdapter == null) {
-            formattedTextFieldAdapter = new JLifeFormattedTextField();
-            handler = new PropertyChangeListener() {
-
-    @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getSource() == formattedTextFieldAdapter &&//
-                            evt.getPropertyName() == "value") {
-                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-                    }
-                }
-            };
-            formattedTextFieldAdapter.addPropertyChangeListener(handler);
-        }
-
-        formattedTextFieldAdapter.setDocument(newValue);
+        formattedTextFieldAdapter(newValue);
     }
 
+	private void formattedTextFieldAdapter(Document newValue) {
+		if (jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter() == null) {
+			jLifeFormattedTextAreaProduct.setFormattedTextFieldAdapter(new JLifeFormattedTextField());
+			handler = new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					if (evt.getSource() == jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter() && evt.getPropertyName() == "value") {
+						firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+					}
+				}
+			};
+			jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().addPropertyChangeListener(handler);
+		}
+		jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().setDocument(newValue);
+	}
+
     public void setValue(Object value) {
-        formattedTextFieldAdapter.setValue(value);
+        jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().setValue(value);
     }
 
     public Object getValue() {
-        return formattedTextFieldAdapter.getValue();
+        return jLifeFormattedTextAreaProduct.getFormattedTextFieldAdapter().getValue();
     }
 
     public void setFormatterFactory(JFormattedTextField.AbstractFormatterFactory newValue) {
-        formattedTextFieldAdapter.setFormatterFactory(newValue);
+        jLifeFormattedTextAreaProduct.setFormatterFactory(newValue);
     }
 
     public JFormattedTextField.AbstractFormatterFactory getFormatterFactory() {
-        return formattedTextFieldAdapter.getFormatterFactory();
+        return jLifeFormattedTextAreaProduct.getFormatterFactory();
     }
 
     /**

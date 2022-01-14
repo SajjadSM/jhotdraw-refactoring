@@ -368,28 +368,8 @@ public class PreferencesUtil
     }
 
     public static void installPalettePrefsHandler(final Preferences prefs, final String name, Window window, int x) {
-        GraphicsConfiguration conf = window.getGraphicsConfiguration();
-        Rectangle screenBounds = conf.getBounds();
-        Insets screenInsets = window.getToolkit().getScreenInsets(conf);
-
-        screenBounds.x += screenInsets.left;
-        screenBounds.y += screenInsets.top;
-        screenBounds.width -= screenInsets.left + screenInsets.right;
-        screenBounds.height -= screenInsets.top + screenInsets.bottom;
-
-        Dimension preferredSize = window.getPreferredSize();
-
-        Rectangle bounds = new Rectangle(
-                prefs.getInt(name + ".x", x + screenBounds.x),
-                prefs.getInt(name + ".y", 0 + screenBounds.y),
-                preferredSize.width,
-                preferredSize.height);
-
-        if (!screenBounds.contains(bounds)) {
-            bounds.x = screenBounds.x;
-            bounds.y = screenBounds.y;
-        }
-        window.setBounds(bounds);
+        Rectangle bounds = bounds2(prefs, name, window, x);
+		window.setBounds(bounds);
 
         window.addComponentListener(new ComponentAdapter() {
 
@@ -417,6 +397,25 @@ public class PreferencesUtil
             }
         });
     }
+
+	private static Rectangle bounds2(final Preferences prefs, final String name, Window window, int x)
+			throws java.awt.HeadlessException {
+		GraphicsConfiguration conf = window.getGraphicsConfiguration();
+		Rectangle screenBounds = conf.getBounds();
+		Insets screenInsets = window.getToolkit().getScreenInsets(conf);
+		screenBounds.x += screenInsets.left;
+		screenBounds.y += screenInsets.top;
+		screenBounds.width -= screenInsets.left + screenInsets.right;
+		screenBounds.height -= screenInsets.top + screenInsets.bottom;
+		Dimension preferredSize = window.getPreferredSize();
+		Rectangle bounds = new Rectangle(prefs.getInt(name + ".x", x + screenBounds.x),
+				prefs.getInt(name + ".y", 0 + screenBounds.y), preferredSize.width, preferredSize.height);
+		if (!screenBounds.contains(bounds)) {
+			bounds.x = screenBounds.x;
+			bounds.y = screenBounds.y;
+		}
+		return bounds;
+	}
 
     /**
      * Installs an intenal frame preferences handler.
