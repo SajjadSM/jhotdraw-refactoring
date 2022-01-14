@@ -89,7 +89,7 @@ import java.lang.reflect.*;
  */
 public class OSXAdapter implements InvocationHandler {
 
-    private OSXAdapterProduct oSXAdapterProduct = new OSXAdapterProduct();
+    private static OSXAdapterProduct oSXAdapterProduct = new OSXAdapterProduct();
 	protected String proxySignature;
     static Object macOSXApplication;
 
