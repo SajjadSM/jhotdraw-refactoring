@@ -33,7 +33,7 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
     /**
      * Specifies the axis of the layout.
      */
-    private int axis;
+    private Axis axis = new XAxis();
 
     /**
      * Creates a layout manager that will lay out components along the
@@ -53,7 +53,17 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
      * @exception AWTError  if the value of <code>axis</code> is invalid 
      */
     public ToolBarLayout(int axis) {
-        this.axis = axis;
+        switch (axis) {
+		case Y_AXIS:
+			this.axis = new YAxis();
+			break;
+		case X_AXIS:
+			this.axis = new XAxis();
+			break;
+		default:
+			this.axis = null;
+			break;
+		}
     }
 
 
@@ -68,24 +78,12 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
 
     @Override
     public float getLayoutAlignmentX(Container target) {
-        switch (axis) {
-            case Y_AXIS:
-                return 0f;
-            case X_AXIS:
-            default:
-                return 0f;
-        }
+        return axis.getLayoutAlignmentX();
     }
 
     @Override
     public float getLayoutAlignmentY(Container target) {
-        switch (axis) {
-            case Y_AXIS:
-                return 0f;
-            case X_AXIS:
-            default:
-                return 0f;
-        }
+        return axis.getLayoutAlignmentY();
     }
 
     @Override
@@ -110,38 +108,12 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
     }
 	private int w(Container parent) {
 		int w = 0;
-		switch (axis) {
-		case Y_AXIS:
-			for (Component c : parent.getComponents()) {
-				Dimension ps = c.getPreferredSize();
-				w = Math.max(w, ps.width);
-			}
-			break;
-		case X_AXIS:
-		default:
-			for (Component c : parent.getComponents()) {
-				Dimension ps = c.getPreferredSize();
-				w += ps.width;
-			}
-		}
+		w = axis.w(w, parent);
 		return w;
 	}
 	private int h(Container parent) {
 		int h = 0;
-		switch (axis) {
-		case Y_AXIS:
-			for (Component c : parent.getComponents()) {
-				Dimension ps = c.getPreferredSize();
-				h += ps.height;
-			}
-			break;
-		case X_AXIS:
-		default:
-			for (Component c : parent.getComponents()) {
-				Dimension ps = c.getPreferredSize();
-				h = Math.max(h, ps.height);
-			}
-		}
+		h = axis.h(h, parent);
 		return h;
 	}
 
@@ -159,7 +131,7 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
         int h = ps.height - insets.top - insets.bottom;
         int x = insets.left;
         int y = insets.top;
-        switch (axis) {
+        switch (getAxis()) {
             case Y_AXIS:
                 for (Component c : parent.getComponents()) {
                     ps = c.getPreferredSize();
@@ -176,4 +148,7 @@ public class ToolBarLayout implements LayoutManager2, Serializable {
                 }
         }
     }
+	public int getAxis() {
+		return axis.getAxis();
+	}
 }

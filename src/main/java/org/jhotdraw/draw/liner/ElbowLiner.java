@@ -111,21 +111,7 @@ public class ElbowLiner
                 path.get(3).moveTo(ep.x, ep.y - shoulderSize);
             }
             
-            switch (soutcode) {
-                case Geom.OUT_RIGHT :
-                    path.get(2).moveTo(path.get(1).x[0], path.get(3).y[0]);
-                    break;
-                case Geom.OUT_TOP :
-                    path.get(2).moveTo(path.get(1).y[0], path.get(3).x[0]);
-                    break;
-                case Geom.OUT_LEFT :
-                    path.get(2).moveTo(path.get(1).x[0], path.get(3).y[0]);
-                    break;
-                case Geom.OUT_BOTTOM :
-                default :
-                    path.get(2).moveTo(path.get(1).y[0], path.get(3).x[0]);
-                    break;
-            }
+            getSoutcodeObject(soutcode).lineout(path);
         } else {
             Point2D.Double sp = start.findStart(figure);
             Point2D.Double ep = end.findEnd(figure);
@@ -199,4 +185,17 @@ public class ElbowLiner
             throw error;
         }
     }
+	private Soutcode getSoutcodeObject(int soutcode) {
+		switch (soutcode) {
+		case Geom.OUT_RIGHT:
+			return new OutRight();
+		case Geom.OUT_TOP:
+			return new OutTop();
+		case Geom.OUT_LEFT:
+			return new OutLeft();
+		case Geom.OUT_BOTTOM:
+			return new OutBottom();
+		}
+		return null;
+	}
 }

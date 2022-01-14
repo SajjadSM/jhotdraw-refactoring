@@ -112,21 +112,7 @@ public class SlantedLiner
                 path.get(3).moveTo(ep.x, ep.y - slantSize);
             }
             
-            switch (soutcode) {
-                case Geom.OUT_RIGHT :
-                    path.get(2).moveTo(path.get(1).x[0], path.get(3).y[0]);
-                    break;
-                case Geom.OUT_TOP :
-                    path.get(2).moveTo(path.get(1).y[0], path.get(3).x[0]);
-                    break;
-                case Geom.OUT_LEFT :
-                    path.get(2).moveTo(path.get(1).x[0], path.get(3).y[0]);
-                    break;
-                case Geom.OUT_BOTTOM :
-                default :
-                    path.get(2).moveTo(path.get(1).y[0], path.get(3).x[0]);
-                    break;
-            }
+            getSoutcode2Object(soutcode).lineout(path);
             
             
             // Regular treatment if the connection connects to two different figures
@@ -223,4 +209,17 @@ public class SlantedLiner
             throw error;
         }
     }
+	private Soutcode2 getSoutcode2Object(int soutcode) {
+		switch (soutcode) {
+		case Geom.OUT_RIGHT:
+			return new OutRight2();
+		case Geom.OUT_TOP:
+			return new OutTop2();
+		case Geom.OUT_LEFT:
+			return new OutLeft2();
+		case Geom.OUT_BOTTOM:
+			return new OutBottom2();
+		}
+		return null;
+	}
 }

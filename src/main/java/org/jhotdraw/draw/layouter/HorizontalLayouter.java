@@ -71,37 +71,25 @@ public class HorizontalLayouter extends AbstractLayouter {
 				Insets2D.Double insets = getInsets(child);
 				double width = child.getPreferredSize().width;
 				double height = child.getPreferredSize().height;
-				switch (compositeAlignment) {
-				case LEADING:
-					child.setBounds(new Point2D.Double(x + insets.left, layoutBounds.y + layoutInsets.top + insets.top),
-							new Point2D.Double(x + insets.left + width,
-									layoutBounds.y + layoutInsets.top + insets.top + height));
-					break;
-				case TRAILING:
-					child.setBounds(
-							new Point2D.Double(x + insets.left,
-									layoutBounds.y + layoutBounds.height - layoutInsets.bottom - insets.bottom
-											- height),
-							new Point2D.Double(x + insets.left + width,
-									layoutBounds.y + layoutBounds.height - layoutInsets.bottom - insets.bottom));
-					break;
-				case CENTER:
-					child.setBounds(
-							new Point2D.Double(x + insets.left,
-									layoutBounds.y + layoutInsets.top + (layoutBounds.height - height) / 2d),
-							new Point2D.Double(x + insets.left + width,
-									layoutBounds.y + layoutInsets.top + (layoutBounds.height + height) / 2d));
-					break;
-				case BLOCK:
-				default:
-					child.setBounds(new Point2D.Double(x + insets.left, layoutBounds.y + layoutInsets.top + insets.top),
-							new Point2D.Double(x + insets.left + width,
-									layoutBounds.y + layoutBounds.height - layoutInsets.bottom - insets.bottom));
-					break;
-				}
+				getCompositeAlignmentObject(compositeAlignment).x(child, x, insets, layoutBounds, layoutInsets, width,
+						height);
 				x += width + insets.left + insets.right;
 			}
 		}
 		return x;
+	}
+
+	private CompositeAlignment getCompositeAlignmentObject(Alignment compositeAlignment) {
+		switch (compositeAlignment) {
+		case LEADING:
+			return new Leading();
+		case TRAILING:
+			return new Trailing();
+		case CENTER:
+			return new Center();
+		case BLOCK:
+			return new Block();
+		}
+		return null;
 	}
 }

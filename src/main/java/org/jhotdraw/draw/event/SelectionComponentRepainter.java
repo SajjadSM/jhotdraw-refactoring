@@ -53,31 +53,10 @@ public class SelectionComponentRepainter extends FigureAdapter
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String name = evt.getPropertyName();
-        if (name == DrawingEditor.ACTIVE_VIEW_PROPERTY) {
-            DrawingView view = view(evt);
-			if (view != null) {
-                view.removePropertyChangeListener(this);
-                if (view.getDrawing() != null) {
-                    view.getDrawing().removeFigureListener(this);
-                }
-            }
-            view = (DrawingView) evt.getNewValue();
-            if (view != null) {
-                view.addPropertyChangeListener(this);
-                if (view.getDrawing() != null) {
-                    view.getDrawing().addFigureListener(this);
-                }
-            }
-            component.repaint();
-        } else if (name == DrawingView.DRAWING_PROPERTY) {
-            Drawing drawing = drawing(evt);
-			component.repaint();
-        } else {
-            component.repaint();
-        }
+        getName2Object(name).propertyChange(evt, this);
     }
 
-	private DrawingView view(PropertyChangeEvent evt) {
+	public DrawingView view(PropertyChangeEvent evt) {
 		DrawingView view = (DrawingView) evt.getOldValue();
 		if (view != null) {
 			view.removeFigureSelectionListener(this);
@@ -89,7 +68,7 @@ public class SelectionComponentRepainter extends FigureAdapter
 		return view;
 	}
 
-	private Drawing drawing(PropertyChangeEvent evt) {
+	public Drawing drawing(PropertyChangeEvent evt) {
 		Drawing drawing = (Drawing) evt.getOldValue();
 		if (drawing != null) {
 			drawing.removeFigureListener(this);
@@ -122,5 +101,21 @@ public class SelectionComponentRepainter extends FigureAdapter
         }
         component = null;
     }
+
+	private Name2 getName2Object(String name) {
+		switch (name) {
+		case DrawingView.DRAWING_PROPERTY:
+			return new DrawingProperty2();
+		case DrawingEditor.ACTIVE_VIEW_PROPERTY:
+			return new ActiveViewProperty2();
+		case DrawingEditor.TOOL_PROPERTY:
+			return new ToolProperty2();
+		}
+		return null;
+	}
+
+	public JComponent getComponent() {
+		return component;
+	}
 }
 

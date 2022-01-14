@@ -52,20 +52,7 @@ public class SelectionComponentDisplayer
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String name = evt.getPropertyName();
-        if (name == DrawingEditor.ACTIVE_VIEW_PROPERTY) {
-            if (view != null) {
-                view.removePropertyChangeListener(this);
-                view.removeFigureSelectionListener(this);
-            }
-            view = (DrawingView) evt.getNewValue();
-            if (view != null) {
-                view.addPropertyChangeListener(this);
-                view.addFigureSelectionListener(this);
-            }
-            updateVisibility();
-        } else if (name == DrawingEditor.TOOL_PROPERTY) {
-            updateVisibility();
-        }
+        getName3Object(name).propertyChange(evt, this);
     }
 
     @Override
@@ -123,5 +110,23 @@ public class SelectionComponentDisplayer
     public void setVisibleIfCreationTool(boolean newValue) {
         isVisibleIfCreationTool = newValue;
     }
+
+	private Name3 getName3Object(String name) {
+		switch (name) {
+		case DrawingEditor.TOOL_PROPERTY:
+			return new ToolProperty3();
+		case DrawingEditor.ACTIVE_VIEW_PROPERTY:
+			return new ActiveViewProperty3();
+		}
+		return null;
+	}
+
+	public DrawingView getView() {
+		return view;
+	}
+
+	public void setView(DrawingView view) {
+		this.view = view;
+	}
 }
 

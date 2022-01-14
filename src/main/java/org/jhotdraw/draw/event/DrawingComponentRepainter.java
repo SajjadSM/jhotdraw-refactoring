@@ -53,31 +53,10 @@ public class DrawingComponentRepainter extends FigureAdapter
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String name = evt.getPropertyName();
-        if (name == DrawingEditor.ACTIVE_VIEW_PROPERTY) {
-            DrawingView view = (DrawingView) evt.getOldValue();
-            if (view != null) {
-                view.removePropertyChangeListener(this);
-                if (view.getDrawing() != null) {
-                    view.getDrawing().removeFigureListener(this);
-                }
-            }
-            view = (DrawingView) evt.getNewValue();
-            if (view != null) {
-                view.addPropertyChangeListener(this);
-                if (view.getDrawing() != null) {
-                    view.getDrawing().addFigureListener(this);
-                }
-            }
-            component.repaint();
-        } else if (name == DrawingView.DRAWING_PROPERTY) {
-            Drawing drawing = drawing(evt);
-			component.repaint();
-        } else {
-            component.repaint();
-        }
+        getNameObject(name).propertyChange(evt, this);
     }
 
-	private Drawing drawing(PropertyChangeEvent evt) {
+	public Drawing drawing(PropertyChangeEvent evt) {
 		Drawing drawing = (Drawing) evt.getOldValue();
 		if (drawing != null) {
 			drawing.removeFigureListener(this);
@@ -104,5 +83,21 @@ public class DrawingComponentRepainter extends FigureAdapter
         }
         component = null;
     }
+
+	private Name getNameObject(String name) {
+		switch (name) {
+		case DrawingView.DRAWING_PROPERTY:
+			return new DrawingProperty();
+		case DrawingEditor.ACTIVE_VIEW_PROPERTY:
+			return new ActiveViewProperty();
+		case DrawingEditor.TOOL_PROPERTY:
+			return new ToolProperty();
+		}
+		return null;
+	}
+
+	public JComponent getComponent() {
+		return component;
+	}
 }
 
