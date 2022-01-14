@@ -26,10 +26,8 @@ import org.jhotdraw.gui.URIChooser;
 public abstract class AbstractApplicationModel extends AbstractBean
         implements ApplicationModel {
 
-    protected String name;
-    protected String version;
-    protected String copyright;
-    protected Class viewClass;
+    private AbstractApplicationModelProduct abstractApplicationModelProduct = new AbstractApplicationModelProduct();
+	protected Class viewClass;
     protected String viewClassName;
     protected boolean allowMultipleViewsForURI = true;
     protected boolean openLastURIOnLaunch = false;
@@ -44,36 +42,30 @@ public abstract class AbstractApplicationModel extends AbstractBean
     }
 
     public void setName(String newValue) {
-        String oldValue = name;
-        name = newValue;
-        firePropertyChange(NAME_PROPERTY, oldValue, newValue);
+        abstractApplicationModelProduct.setName(newValue, this);
     }
 
     @Override
     public String getName() {
-        return name;
+        return abstractApplicationModelProduct.getName();
     }
 
     public void setVersion(String newValue) {
-        String oldValue = version;
-        version = newValue;
-        firePropertyChange(VERSION_PROPERTY, oldValue, newValue);
+        abstractApplicationModelProduct.setVersion(newValue, this);
     }
 
     @Override
     public String getVersion() {
-        return version;
+        return abstractApplicationModelProduct.getVersion();
     }
 
     public void setCopyright(String newValue) {
-        String oldValue = copyright;
-        copyright = newValue;
-        firePropertyChange(COPYRIGHT_PROPERTY, oldValue, newValue);
+        abstractApplicationModelProduct.setCopyright(newValue, this);
     }
 
     @Override
     public String getCopyright() {
-        return copyright;
+        return abstractApplicationModelProduct.getCopyright();
     }
 
     /**
