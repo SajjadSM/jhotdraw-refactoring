@@ -171,4 +171,9 @@ public class Dimension2DDouble extends Dimension2D implements java.io.Serializab
     public String toString() {
 	return getClass().getName() + "[width=" + width + ",height=" + height + "]";
     }
+
+	public void setArc(RoundRectangle2D.Double roundrect) {
+		roundrect.arcwidth = Math.max(0d, Math.min(roundrect.width, this.width * 2d));
+		roundrect.archeight = Math.max(0d, Math.min(roundrect.height, this.height * 2d));
+	}
 }

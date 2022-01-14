@@ -496,6 +496,22 @@ public class JFontChooser extends JComponent {
     }// </editor-fold>//GEN-END:initComponents
      */
 
+	public void setNewSelectionPath(@Nullable FontCollectionNode newCollection, @Nullable FontFamilyNode newFamily,
+			@Nullable FontFaceNode newFace) {
+		FontChooserModel model = getModel();
+		TreePath newPath;
+		if (newFace != null) {
+			newPath = new TreePath(new Object[] { model.getRoot(), newCollection, newFamily, newFace });
+		} else if (newFamily != null) {
+			newPath = new TreePath(new Object[] { model.getRoot(), newCollection, newFamily });
+		} else if (newCollection != null) {
+			newPath = new TreePath(new Object[] { model.getRoot(), newCollection });
+		} else {
+			newPath = new TreePath(model.getRoot());
+		}
+		setSelectionPath(newPath);
+	}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

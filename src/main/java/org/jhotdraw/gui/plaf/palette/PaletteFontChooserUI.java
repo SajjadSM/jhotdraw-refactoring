@@ -329,7 +329,7 @@ public class PaletteFontChooserUI extends FontChooserUI {
             }
         }
 
-        setNewSelectionPath(newCollection, newFamily, newFace);
+        fontChooser.setNewSelectionPath(newCollection, newFamily, newFace);
     }
 
     private void doFamilyChanged() {
@@ -364,7 +364,7 @@ public class PaletteFontChooserUI extends FontChooserUI {
                 }
             }
         }
-        setNewSelectionPath(newCollection, newFamily, newFace);
+        fontChooser.setNewSelectionPath(newCollection, newFamily, newFace);
     }
 
     private void doFaceChanged() {
@@ -379,35 +379,7 @@ public class PaletteFontChooserUI extends FontChooserUI {
         FontFamilyNode newFamily = oldFamily;
         FontFaceNode newFace = (FontFaceNode) list.getSelectedValue();
 
-        setNewSelectionPath(newCollection, newFamily, newFace);
-    }
-
-    private void setNewSelectionPath(@Nullable FontCollectionNode newCollection, @Nullable FontFamilyNode newFamily, @Nullable FontFaceNode newFace) {
-        FontChooserModel model = fontChooser.getModel();
-
-        TreePath newPath;
-        if (newFace != null) {
-            newPath = new TreePath(new Object[]{
-                        model.getRoot(),
-                        newCollection,
-                        newFamily,
-                        newFace
-                    });
-        } else if (newFamily != null) {
-            newPath = new TreePath(new Object[]{
-                        model.getRoot(),
-                        newCollection,
-                        newFamily
-                    });
-        } else if (newCollection != null) {
-            newPath = new TreePath(new Object[]{
-                        model.getRoot(),
-                        newCollection
-                    });
-        } else {
-            newPath = new TreePath(model.getRoot());
-        }
-        fontChooser.setSelectionPath(newPath);
+        fontChooser.setNewSelectionPath(newCollection, newFamily, newFace);
     }
 
     private class SelectionPanelHandler implements KeyListener, MouseListener, ListSelectionListener {

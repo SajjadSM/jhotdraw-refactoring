@@ -509,4 +509,16 @@ public class SVGPathFigure extends AbstractAttributedCompositeFigure implements 
         set(TRANSFORM, null);
         changed();
     }
+
+	public boolean isLinear() {
+		BezierFigure bezier = (BezierFigure) getChild(0);
+		boolean isLinear = true;
+		for (int i = 0, n = bezier.getNodeCount(); i < n; i++) {
+			if (bezier.getNode(i).getMask() != 0) {
+				isLinear = false;
+				break;
+			}
+		}
+		return isLinear;
+	}
 }
